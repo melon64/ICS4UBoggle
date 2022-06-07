@@ -9,6 +9,21 @@ package src;
 import java.util.ArrayList;
 
 public class BoggleAlgorithm {
+    public static boolean isWordOnBoard(char[][] board, String word) {        
+        for (int i = 0; i < board.length; i++) {
+            for (int j = 0; j < board[0].length; j++) {
+                if (board[i][j] == word.charAt(0)) {
+                    if (canFormWordFromPos(board, word.substring(1, word.length()), i, j)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        
+        // If the program didn't find the word on the board yet, return false
+        return false;
+    }
+    
     public static boolean canFormWordFromPos(char[][] board, String word, int currRow, int currCol) {
         if (word.length() == 0) {
             return true;
