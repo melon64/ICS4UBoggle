@@ -8,27 +8,34 @@ package ICS4UBoggle.src;
 
 import java.util.ArrayList;
 
-public class BoggleAlgorithms {
+public class BoggleAlgorithms {    
     /**
      * This method checks whether or not a specific word is found on the board.
      * 
      * @param board The letters that are currently on the board
      * @param word  The word to check for on the board
-     * @return      A boolean that contains whether or not the word is on the board
+     * @return      An array list of integer arrays that represents the path required 
+     *              to form the word - each array contains an x and a y coordinate; 
+     *              returns an empty array list if the word isn't found
      */
-    public static boolean isWordOnBoard(char[][] board, String word) {        
+    public static ArrayList<Integer[]> getWordPath(char[][] board, String word) {
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board[0].length; j++) {
                 if (board[i][j] == word.charAt(0)) {
-                    if (canFormWordFromPos(board, word.substring(1, word.length()), i, j)) {
-                        return true;
+                    ArrayList<Integer[]> currWordPath = new ArrayList<Integer[]>();
+                    currWordPath.add(new Integer[]{i, j});
+                    ArrayList<Integer[]> wordPath = getWordPathFromPos(board, word.substring(1, word.length()), i, j, currWordPath);
+                    if (wordPath.size() > 0) {
+                        // If the program finds the rest of the word if its starts at a 
+                        // specific position, return the path of letters used to form the word
+                        return wordPath;
                     }
                 }
             }
         }
         
-        // If the program didn't find the word on the board yet, return false
-        return false;
+        // If the program didn't find the word on the board yet, return an empty path
+        return new ArrayList<Integer[]>();
     }
     
     /**
@@ -40,17 +47,19 @@ public class BoggleAlgorithms {
      * after that and so on until all the letters in the word have been found in one 
      * contiguous sequence.
      * 
-     * @param board   The letters that are currently on the board excluding all 
-     *                letters that have already been used to form part of the word
-     * @param word    The word to try to find on the board
-     * @param currRow The row which contains the first letter of the word
-     * @param currCol The column which contains the first letter of the word
-     * @return        A boolean that contains whether or not the word can be created if 
-     *                you start at the specific position
+     * @param board    The letters that are currently on the board excluding all 
+     *                 letters that have already been used to form part of the word
+     * @param word     The word to try to find on the board
+     * @param currRow  The row which contains the first letter of the word
+     * @param currCol  The column which contains the first letter of the word
+     * @param wordPath The path of letters taken to form the word so far
+     * @return         The path of letters starting from the start position needed to form 
+     *                 the word; returns an empty array list if the word cannot be made 
+     *                 from the start position
      */
-    public static boolean canFormWordFromPos(char[][] board, String word, int currRow, int currCol) {
+    public static ArrayList<Integer[]> getWordPathFromPos(char[][] board, String word, int currRow, int currCol, ArrayList<Integer[]> wordPath) {
         if (word.length() == 0) {
-            return true;
+            return wordPath;
         } else {
             ArrayList<Integer[]> moveList = getMoveList(board, currRow, currCol, word.charAt(0));
             for (Integer[] move: moveList) {
@@ -65,15 +74,18 @@ public class BoggleAlgorithms {
                 // the board so that it isn't reused (as this would be illegal)
                 newBoard[currRow][currCol] = ' ';
                 
+                ArrayList<Integer[]> newWordPath = cloneIntegerArrList(wordPath);
+                newWordPath.add(new Integer[]{currRow + move[0], currCol + move[1]});
                 // Make a recursive call to check if the rest of the word can be formed
-                if (canFormWordFromPos(newBoard, newWord, currRow + move[0], currCol + move[1])) {
-                    return true;
+                newWordPath = getWordPathFromPos(newBoard, newWord, currRow + move[0], currCol + move[1], newWordPath);
+                if (newWordPath.size() > 0) {
+                    return newWordPath;
                 }
             }
             
             // If the program didn't find the word on the board from the starting 
             // position yet, return false
-            return false;
+            return new ArrayList<Integer[]>();
         }
     }
 
@@ -92,6 +104,25 @@ public class BoggleAlgorithms {
             }
         }
         return newArr;
+    }
+
+    /**
+     * This method makes a deep copy of a given array list of integer arrays. This means that 
+     * the method copies each individual value, not just the references to those values.
+     * 
+     * @param arrList The array list that needs to be clones
+     * @return        A deep copy of the array list of integer arrays
+     */
+    public static ArrayList<Integer[]> cloneIntegerArrList(ArrayList<Integer[]> arrList) {
+        ArrayList<Integer[]> newArrList = new ArrayList<Integer[]>();
+        for (int i = 0; i < arrList.size(); i++) {
+            Integer[] intArr = new Integer[arrList.get(i).length];
+            for (int j = 0; j < intArr.length; j++) {
+                intArr[j] = arrList.get(i)[j];
+            }
+            newArrList.add(intArr);
+        }
+        return newArrList;
     }
     
     /**
