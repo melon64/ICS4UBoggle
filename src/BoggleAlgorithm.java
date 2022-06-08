@@ -1,4 +1,4 @@
-package src;
+package ICS4UBoggle.src;
 
 /**
  * Names: Adarsh P, Larris X, Felix X, and Hubert X
