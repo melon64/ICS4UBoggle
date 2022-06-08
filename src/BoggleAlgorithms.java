@@ -8,7 +8,7 @@ package ICS4UBoggle.src;
 
 import java.util.ArrayList;
 
-public class BoggleAlgorithms {    
+public class BoggleAlgorithms {
     /**
      * This method checks whether or not a specific word is found on the board.
      * 
@@ -213,6 +213,26 @@ public class BoggleAlgorithms {
             // If the word is in neither of the two indices, it is not in the list at 
             // all, so return -1
             return -1;
+        }
+    }
+
+    /**
+     * This method calculates the number of points a word is worth given that the word is valid.
+     * 
+     * @param wordLength The length of the valid word
+     * @return           The number of points the word is worth
+     */
+    public static int getScore(int wordLength) {
+        if (wordLength >= 8) {
+            return 11;
+        } else if (wordLength >= 7) {
+            return 5;
+        } else if (wordLength >= 6) {
+            return 3;
+        } else if (wordLength >= 5) {
+            return 2;
+        } else {
+            return 1;
         }
     }
 }
