@@ -9,6 +9,8 @@ package ICS4UBoggle.src;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.*;
+import java.util.ArrayList;
 
 public class BoggleSetupMenu extends JFrame {
     JPanel mainPanel;
@@ -21,6 +23,8 @@ public class BoggleSetupMenu extends JFrame {
     JSpinner timerSpinner;
     JLabel scoreLabel;
     JSpinner scoreSpinner;
+    JLabel musicLabel;
+    JComboBox<String> musicChoiceBox;
     JButton startButton;
     
     public BoggleSetupMenu() {
@@ -29,7 +33,7 @@ public class BoggleSetupMenu extends JFrame {
         // ====================================
         
         setTitle("Boggle Setup Menu");
-        setSize(325, 275);
+        setSize(325, 300);
         
         mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
@@ -124,6 +128,23 @@ public class BoggleSetupMenu extends JFrame {
 
 
         // ====================================
+        // MUSIC SELECTION SECTION
+        // ====================================
+        
+        musicLabel = new JLabel("Music Choice:");
+        constraints.gridx = 0;
+        constraints.gridy = 4;
+        constraints.anchor = GridBagConstraints.EAST;
+        settingsPanel.add(musicLabel, constraints);
+
+        musicChoiceBox = new JComboBox<String>(getMusicFileNames());
+        constraints.gridx = 1;
+        constraints.gridy = 4;
+        constraints.anchor = GridBagConstraints.WEST;
+        settingsPanel.add(musicChoiceBox, constraints);
+
+
+        // ====================================
         // SUBMIT BUTTON SECTION
         // ====================================
 
@@ -152,5 +173,29 @@ public class BoggleSetupMenu extends JFrame {
         setResizable(false);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setVisible(true);
+    }
+
+    /**
+     * This function gets a list of all the music files in the music directory
+     * 
+     * @return A list of all the files in the music directory
+     */
+    public static String[] getMusicFileNames() {
+        File file = new File("ICS4UBoggle/music");
+        String[] fileArr = file.list();
+        ArrayList<String> musicList = new ArrayList<String>();
+        // The following is the extension that the program is looking for, so it 
+        // will ignore all files that do not have this extension
+        String expectedExtension = ".mp3";
+
+        for (int i = 0; i < fileArr.length; i++) {
+            // Only add the file to te list if it is a music file
+            if (fileArr[i].substring(fileArr[i].length() - 4, fileArr[i].length()).equals(expectedExtension)) {
+                musicList.add(fileArr[i].substring(0, fileArr[i].length() - expectedExtension.length()));
+            }
+        }
+        
+        // Convert the array list back into a string array before returning it
+        return musicList.toArray(new String[musicList.size()]);
     }
 }
