@@ -28,8 +28,10 @@ public class BoggleGameScreen extends JFrame {
     JButton submitButton2;
     JLabel score;
     JLabel score2;
+    JLabel winner;
+    JButton restartButton;
     
-    public BoggleGameScreen() {
+    public BoggleGameScreen(String gameMode) {
         // ====================================
         // INITIAL SECTION
         // ====================================
@@ -64,20 +66,29 @@ public class BoggleGameScreen extends JFrame {
                 
             }
         };
-
+        
+        // shared between both modes
         playerIndication = new JLabel("Player 1", JLabel.LEFT);
-        // check which mode
-        playerIndication2 = new JLabel("Player 2", JLabel.LEFT);
-        wordLabel = new JLabel("Enter word: ", JLabel.LEFT);
-        // depends on which mode "Computer's word: "
-        wordLabel2 = new JLabel("Enter word: ", JLabel.LEFT);
+        wordLabel = new JLabel("Enter Word: ", JLabel.LEFT);
         wordInput = new JTextField("", 8);
-        wordInput2 = new JTextField("", 8);
         submitButton = new JButton("GUESS");
-        submitButton2 = new JButton("GUESS");
-
         submitButton.addActionListener(submitWord);
+        submitButton2 = new JButton("GUESS");
         submitButton2.addActionListener(submitWord);
+        
+        // depends on which mode 
+        if (gameMode.equals("Single Player")) {
+            playerIndication2 = new JLabel("Computer Player", JLabel.LEFT);
+            wordLabel2 = new JLabel("Computer's Word: ", JLabel.LEFT);
+            wordInput2.setVisible(false);
+            submitButton2.setVisible(false);
+        }
+        else {
+            playerIndication2 = new JLabel("Player 2", JLabel.LEFT);
+            wordLabel2 = new JLabel("Enter Word: ", JLabel.LEFT);
+            wordInput2 = new JTextField("", 8);
+        }
+        
         inputPanel.add(playerIndication);
         inputPanel.add(playerIndication2);
         inputPanel.add(wordLabel);
@@ -97,6 +108,9 @@ public class BoggleGameScreen extends JFrame {
         // BOGGLE BOARD SECTION
         // ====================================
         
+        JLabel[][] board = new JLabel[5][5];
+        //createGrid(board);
+       
 
         // ====================================
         // SCORE SECTION
@@ -105,6 +119,18 @@ public class BoggleGameScreen extends JFrame {
         // ====================================
         // RESULTS SECTION
         // ====================================
+        JLabel winner = new JLabel();
+        restartButton = new JButton("RESTART");
+        restartButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // reset all componenets
+                createGrid(board);
+                revalidate();
+                repaint();
+                
+            }
+        });
 
         // ====================================
         // FINALIZATION SECTION
