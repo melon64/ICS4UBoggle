@@ -9,5 +9,6 @@ package ICS4UBoggle.src;
 public class BoggleGame {
     public static void main(String[] args) {
         BoggleSetupMenu menuGUI = new BoggleSetupMenu();
+        // BoggleGameScreen boggle = new BoggleGameScreen();
     }
 }
