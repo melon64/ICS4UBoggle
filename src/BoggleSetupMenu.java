@@ -186,7 +186,7 @@ public class BoggleSetupMenu extends JFrame {
         ArrayList<String> musicList = new ArrayList<String>();
         // The following is the extension that the program is looking for, so it 
         // will ignore all files that do not have this extension
-        String expectedExtension = ".mp3";
+        String expectedExtension = ".wav";
 
         for (int i = 0; i < fileArr.length; i++) {
             // Only add the file to te list if it is a music file
