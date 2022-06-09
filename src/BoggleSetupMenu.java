@@ -157,7 +157,8 @@ public class BoggleSetupMenu extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 // create the main game screen GUI when this button is clicked
                 setVisible(false);
-                BoggleGameScreen boggleGame = new BoggleGameScreen();
+                String gameMode = modeChoiceBox.getSelectedItem().toString();
+                BoggleGameScreen boggleGame = new BoggleGameScreen(gameMode);
             }
         });
 
