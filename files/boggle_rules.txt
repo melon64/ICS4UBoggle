@@ -1,0 +1,12 @@
+
+Game Overview
+Boggle is a word game that is played on a 5x5 board with two players. Every space on the board contains a die showing a letter on it. The goal of the game is to create words that are as long as possible using the letters on the board.
+The game is played over alternating turns, each of which is timed. On their turn a player must find a word or pass if they cannot find a word.
+
+Finding a word
+When finding a word, a player must be able to form a contiguous (diagonals are allowed) path of letters that form the word. No individual die on the board an be reused twice, but multiple dice with the same letter can all be used.
+The word that the player finds must meet three more requirements: 1) the word has not yet been found by either player, 2) the word is in the English dictionary, and 3) the word has at least as many letters as the minimum threshold (usually 3). Given how long the word was, the player recieves points based on the following scoring scheme: 3 or 4 --> 1; 5 --> 2; 6 --> 3; 7 --> 5; 8+ --> 11.
+If a player chooses to pass or their timer runs out, play passes on to the other player. Lastly, when both players pass twice, the player whose turn it is has the option to "Shake It Up!" which randomly resets the board.
+
+End of the Game
+Boggle ends when a player reaches a specified number of points. This specified number of points is called the "Tournament Score" and is usually specified at the beginning of the game. The player who reached the "Tournament Score" is declared the winner of the game.
