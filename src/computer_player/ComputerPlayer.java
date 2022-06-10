@@ -1,3 +1,5 @@
+package ICS4UBoggle.src.computer_player;
+
 public class ComputerPlayer {
     Cell[][] cells;
     int rows; // y
