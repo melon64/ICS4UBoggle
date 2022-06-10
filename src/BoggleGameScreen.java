@@ -41,7 +41,7 @@ public class BoggleGameScreen extends JFrame {
         setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
 
         inputPanel = new JPanel();
-        inputPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10));
+        inputPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 10));
 
         timerPanel = new JPanel();
         timerPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
