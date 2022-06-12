@@ -15,6 +15,7 @@ import java.util.*;
 public class BoggleGameScreen extends JFrame {
     JPanel inputPanel;
     JPanel timerPanel;
+    JPanel wordResultPanel;
     JPanel boardPanel;
     JPanel scorePanel;
     JPanel outputPanel;
@@ -26,39 +27,57 @@ public class BoggleGameScreen extends JFrame {
     JTextField wordInput2;
     JButton submitButton;
     JButton submitButton2;
-    JLabel score;
-    JLabel score2;
+    JLabel timerLabel;
+    JLabel wordResult;
+    JLabel scoreLabel;
+    JLabel scoreLabel2;
+    JLabel tournamentScoreLabel;
     JLabel winner;
     JButton restartButton;
+
+    int score = 0;
+    int score2 = 0;
     
-    public BoggleGameScreen(String gameMode) {
+    public BoggleGameScreen(String gameMode, int tournamentScore) {
         // ====================================
         // INITIAL SECTION
         // ====================================
-        
+
         setTitle("Boggle Game Screen");
-        setSize(1080, 720);
+        setSize(1080, 960);
         setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
 
         inputPanel = new JPanel();
         inputPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 10));
+        inputPanel.setPreferredSize(new Dimension(1080, 50));
+        // inputPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 
         timerPanel = new JPanel();
         timerPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+        // timerPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+
+        wordResultPanel = new JPanel();
+        wordResultPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
+        wordResultPanel.setMaximumSize(new Dimension(1080, 50));
+        // wordResultPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         
         boardPanel = new JPanel();
         boardPanel.setLayout(new GridLayout(5, 5));
+        // boardPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        boardPanel.setPreferredSize(new Dimension(1080, 300));
 
         scorePanel = new JPanel();
-        scorePanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+        scorePanel.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 10));
+        scorePanel.setPreferredSize(new Dimension(1080, 50));
+        scorePanel.setMaximumSize(new Dimension(1080, 50));
 
         outputPanel = new JPanel();
-        outputPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
+        outputPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 50));
 
         // ====================================
         // USER INPUT SECTION
         // ====================================
-        
+
         ActionListener submitWord = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -69,22 +88,21 @@ public class BoggleGameScreen extends JFrame {
         
         // declare components for input
         playerIndication = new JLabel("Player 1", JLabel.CENTER);
-        playerIndication.setPreferredSize(new Dimension(520, 50));
-//        playerIndication.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         wordLabel = new JLabel("Enter Word: ", JLabel.RIGHT);
-        wordLabel.setPreferredSize(new Dimension(200, 20));
         wordInput = new JTextField("", 8);
         submitButton = new JButton("GUESS");
         submitButton.addActionListener(submitWord);
         playerIndication2 = new JLabel("Player 2", JLabel.CENTER);
-        playerIndication2.setPreferredSize(new Dimension(520, 50));
-//        playerIndication2.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         wordLabel2 = new JLabel("Enter Word: ", JLabel.RIGHT);
-        wordLabel2.setPreferredSize(new Dimension(350, 20));
         wordInput2 = new JTextField("", 8);
         submitButton2 = new JButton("GUESS");
         submitButton2.addActionListener(submitWord);
         
+        wordLabel.setPreferredSize(new Dimension(200, 20));
+        playerIndication.setPreferredSize(new Dimension(520, 50));
+        wordLabel2.setPreferredSize(new Dimension(350, 20));
+        playerIndication2.setPreferredSize(new Dimension(520, 50));
+
         // changes depending on mode 
         if (gameMode.equals("Single Player")) {
             playerIndication2.setText("Computer Player");
@@ -106,26 +124,58 @@ public class BoggleGameScreen extends JFrame {
         // ====================================
         // TIMER SECTION
         // ====================================
-        
 
+        timerLabel = new JLabel("INSERT TIMER HERE", JLabel.CENTER);
+
+        timerPanel.add(timerLabel);
+
+        // ====================================
+        // WORD RESULT SECTION
+        // ====================================
+
+        wordResult = new JLabel("ex. AND is worth 6 points", JLabel.CENTER);
+        wordResult.setFont(new Font("Dialog", Font.PLAIN, 20));
+        wordResult.setPreferredSize(new Dimension(1080, 50));
+
+        wordResultPanel.add(wordResult);
 
         // ====================================
         // BOGGLE BOARD SECTION
         // ====================================
-        
+
         JLabel[][] board = new JLabel[5][5];
         createGrid(board);
-        boardPanel.setPreferredSize(new Dimension(1080, 400));
 
         // ====================================
         // SCORE SECTION
         // ====================================
-        
+
+        scoreLabel = new JLabel("Player 1 Score: " + score, JLabel.CENTER);
+        String playerScore = gameMode.equals("Single Player") ? "Computer Player Score: " : "Player 2 Score: ";
+        scoreLabel2 = new JLabel(playerScore + score, JLabel.CENTER);
+        tournamentScoreLabel = new JLabel("Score to Reach: " + tournamentScore, JLabel.CENTER);
+
+        scoreLabel.setFont(new Font("Dialog", Font.PLAIN, 18));
+        scoreLabel2.setFont(new Font("Dialog", Font.PLAIN, 18));
+        tournamentScoreLabel.setFont(new Font("Dialog", Font.BOLD, 18));
+        scoreLabel.setPreferredSize(new Dimension(420, 50));
+        scoreLabel2.setPreferredSize(new Dimension(400, 50));
+        tournamentScoreLabel.setPreferredSize(new Dimension(200, 50));
+
+        scorePanel.add(scoreLabel);
+        scorePanel.add(tournamentScoreLabel);
+        scorePanel.add(scoreLabel2);
+
         // ====================================
         // RESULTS SECTION
         // ====================================
-        JLabel winner = new JLabel();
+
+        winner = new JLabel("The winner is ", JLabel.CENTER);
         restartButton = new JButton("RESTART");
+
+        winner.setFont(new Font("Dialog", Font.BOLD, 24));
+        winner.setPreferredSize(new Dimension(1080, 50));
+        // winner.setVisible(false);
         restartButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -133,16 +183,17 @@ public class BoggleGameScreen extends JFrame {
                 createGrid(board);            
             }
         });
-        
+
         outputPanel.add(winner);
         outputPanel.add(restartButton);
 
         // ====================================
         // FINALIZATION SECTION
         // ====================================
-        
+
         add(inputPanel);
         add(timerPanel);
+        add(wordResultPanel);
         add(boardPanel);
         add(scorePanel);
         add(outputPanel);
@@ -154,18 +205,19 @@ public class BoggleGameScreen extends JFrame {
         setVisible(true);
     }
     private final char[][] dice = {{'A','A','A','F','R','S'}, {'A','A','E','E','E','E'}, {'A','A','F','I','R','S'}, {'A','D','E','N','N','N'}, {'A','E','E','E','E','M'}, {'A','E','E','G','M','U'}, 
-    		{'A','E','G','M','N','N'}, {'A','F','I','R','S','Y'}, {'B','J','K','Q','X','Z'}, {'C','C','N','S','T','W'}, {'C','E','I','I','L','T'}, {'C','E','I','L','P','T'}, {'C','E','I','P','S','T'},
-    		{'D','D','L','N','O','R'}, {'D','H','H','L','O','R'}, {'D','H','H','N','O','T'}, {'D','H','L','N','O','R'}, {'E','I','I','I','T','T'}, {'E','M','O','T','T','T'}, {'E','N','S','S','S','U'},
-    		{'F','I','P','R','S','Y'}, {'G','O','R','R','V','W'}, {'H','I','P','R','R','Y'}, {'N','O','O','T','U','W'}, {'O','O','O','T','T','U'}};
+    {'A','E','G','M','N','N'}, {'A','F','I','R','S','Y'}, {'B','J','K','Q','X','Z'}, {'C','C','N','S','T','W'}, {'C','E','I','I','L','T'}, {'C','E','I','L','P','T'}, {'C','E','I','P','S','T'},
+    {'D','D','L','N','O','R'}, {'D','H','H','L','O','R'}, {'D','H','H','N','O','T'}, {'D','H','L','N','O','R'}, {'E','I','I','I','T','T'}, {'E','M','O','T','T','T'}, {'E','N','S','S','S','U'},
+    {'F','I','P','R','S','Y'}, {'G','O','R','R','V','W'}, {'H','I','P','R','R','Y'}, {'N','O','O','T','U','W'}, {'O','O','O','T','T','U'}};
     
     private void createGrid(JLabel[][] grid) {
-    	boardPanel.removeAll();
+        boardPanel.removeAll();
     	Random rGen = new Random();
     	int diceCount = 0;
     	for (int i = 0; i < grid.length; i++) {
 			for (int j = 0; j < grid[0].length; j++) {
 				int randNum = rGen.nextInt(6);
 				grid[i][j] = new JLabel(""+dice[diceCount][randNum], JLabel.CENTER);
+                grid[i][j].setFont(new Font("Dialog", Font.BOLD, 24));
 				grid[i][j].setBorder(BorderFactory.createLineBorder(Color.BLACK));
 				grid[i][j].setBackground(Color.WHITE);
 				grid[i][j].setOpaque(true);
