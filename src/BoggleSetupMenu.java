@@ -159,7 +159,8 @@ public class BoggleSetupMenu extends JFrame {
                 setVisible(false);
                 String gameMode = modeChoiceBox.getSelectedItem().toString();
                 int tournamentScore = (int) scoreSpinner.getValue();
-                new BoggleGameScreen(gameMode, tournamentScore);
+                int duration = (int) timerSpinner.getValue();
+                new BoggleGameScreen(gameMode, tournamentScore, duration);
             }
         });
 
