@@ -37,6 +37,8 @@ public class BoggleGameScreen extends JFrame {
 
     int score = 0;
     int score2 = 0;
+
+    private final ArrayList<char[]> dice = readDiceDistribution();
     
     public BoggleGameScreen(String gameMode, int tournamentScore) {
         // ====================================
@@ -204,10 +206,6 @@ public class BoggleGameScreen extends JFrame {
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setVisible(true);
     }
-    private final char[][] dice = {{'A','A','A','F','R','S'}, {'A','A','E','E','E','E'}, {'A','A','F','I','R','S'}, {'A','D','E','N','N','N'}, {'A','E','E','E','E','M'}, {'A','E','E','G','M','U'}, 
-    {'A','E','G','M','N','N'}, {'A','F','I','R','S','Y'}, {'B','J','K','Q','X','Z'}, {'C','C','N','S','T','W'}, {'C','E','I','I','L','T'}, {'C','E','I','L','P','T'}, {'C','E','I','P','S','T'},
-    {'D','D','L','N','O','R'}, {'D','H','H','L','O','R'}, {'D','H','H','N','O','T'}, {'D','H','L','N','O','R'}, {'E','I','I','I','T','T'}, {'E','M','O','T','T','T'}, {'E','N','S','S','S','U'},
-    {'F','I','P','R','S','Y'}, {'G','O','R','R','V','W'}, {'H','I','P','R','R','Y'}, {'N','O','O','T','U','W'}, {'O','O','O','T','T','U'}};
     
     private void createGrid(JLabel[][] grid) {
         boardPanel.removeAll();
@@ -226,5 +224,23 @@ public class BoggleGameScreen extends JFrame {
 			}
 		}
     	revalidate();
+    }
+
+    private ArrayList<char[]> readDiceDistribution() {
+        ArrayList<char[]> diceList = new ArrayList<char[]>();
+        try {
+            File file = new File("ICS4UBoggle/files/dice_distribution.txt");
+            Scanner in = new Scanner(file);
+
+            while (in.hasNextLine()) {
+                String nextLine = in.nextLine();
+                char[] dieFaces = new char[6];
+                for (int i = 0; i < dieFaces.length; i++) {
+                    dieFaces[i] = nextLine.charAt(i);
+                }
+                diceList.add(dieFaces);
+            }
+        } catch (FileNotFoundException exception) {};
+        return diceList;
     }
 }
