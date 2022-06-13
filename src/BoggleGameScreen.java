@@ -209,18 +209,22 @@ public class BoggleGameScreen extends JFrame {
     
     private void createGrid(JLabel[][] grid) {
         boardPanel.removeAll();
-    	Random rGen = new Random();
-    	int diceCount = 0;
+        Random rGen = new Random();
+        ArrayList<char[]> diceCopy = (ArrayList<char[]>)dice.clone();
+
     	for (int i = 0; i < grid.length; i++) {
 			for (int j = 0; j < grid[0].length; j++) {
-				int randNum = rGen.nextInt(6);
-				grid[i][j] = new JLabel(""+dice[diceCount][randNum], JLabel.CENTER);
+                int randDie = rGen.nextInt(diceCopy.size());
+                int randFace = rGen.nextInt(6);
+                
+                grid[i][j] = new JLabel("" + diceCopy.get(randDie)[randFace], JLabel.CENTER);
                 grid[i][j].setFont(new Font("Dialog", Font.BOLD, 24));
 				grid[i][j].setBorder(BorderFactory.createLineBorder(Color.BLACK));
 				grid[i][j].setBackground(Color.WHITE);
 				grid[i][j].setOpaque(true);
-				boardPanel.add(grid[i][j]);
-				diceCount++;
+                
+                boardPanel.add(grid[i][j]);
+                diceCopy.remove(randDie);
 			}
 		}
     	revalidate();
