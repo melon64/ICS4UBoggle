@@ -207,6 +207,12 @@ public class BoggleGameScreen extends JFrame {
         setVisible(true);
     }
     
+    /**
+     * This method creates a grid of labels by choosing random dice and a random face of 
+     * that die to place in every one of the 25 positions on the grib
+     * 
+     * @param grid A grid filled with JLabels that will be edited by this method
+     */
     private void createGrid(JLabel[][] grid) {
         boardPanel.removeAll();
         Random rGen = new Random();
@@ -230,6 +236,11 @@ public class BoggleGameScreen extends JFrame {
     	revalidate();
     }
 
+    /**
+     * A method that reads in the dice distributions from a text file
+     * 
+     * @return An array list containing character arrays with the faces of every die
+     */
     private ArrayList<char[]> readDiceDistribution() {
         ArrayList<char[]> diceList = new ArrayList<char[]>();
         try {
