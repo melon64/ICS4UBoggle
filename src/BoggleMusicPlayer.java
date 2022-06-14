@@ -26,7 +26,7 @@ public class BoggleMusicPlayer {
             public void run() {
                 try {
                     AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(
-                        new File("ICS4UBoggle/music/" + trackName + MUSIC_EXTENSION).getAbsoluteFile());
+                        new File("ICS4UBoggle/audio/" + trackName + MUSIC_EXTENSION).getAbsoluteFile());
                     clipPaused = false;
 
                     Clip clip = AudioSystem.getClip();
