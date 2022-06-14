@@ -37,7 +37,7 @@ public class BoggleGameScreen extends JFrame {
     JButton restartButton;
 
     private char[][] grid = new char[5][5];
-    private JLabel[][] board = new JLabel[5][5];
+    private JButton[][] board = new JButton[5][5];
 
     private int score = 0;
     private int score2 = 0;
@@ -48,7 +48,7 @@ public class BoggleGameScreen extends JFrame {
     private final ArrayList<String> dictionary = getDictionaryFromFile();
     private final ArrayList<char[]> dice = readDiceDistribution();
 
-    public BoggleGameScreen(String gameMode, int tournamentScore, int duration, int minLength) {
+    public BoggleGameScreen(String gameMode, int tournamentScore, int duration, int minLength, String track) {
         // ====================================
         // INITIAL SECTION
         // ====================================
@@ -83,6 +83,12 @@ public class BoggleGameScreen extends JFrame {
         outputPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 50));
 
         Font defaultFont = new Font("Dialog", Font.PLAIN, 18);
+
+        // ====================================
+        // MUSIC SECTION
+        // ====================================
+
+        BoggleMusicPlayer musicPlayer = new BoggleMusicPlayer(track);
 
         // ====================================
         // USER INPUT SECTION
@@ -313,9 +319,9 @@ public class BoggleGameScreen extends JFrame {
      * that die to place in every one of the 25 positions on the grid
      * 
      * @param grid A grid filled with characters that will contain the values of the board
-     * @param board A grid filled with JLabels that will be edited by this method
+     * @param board A grid filled with JButtons that will be edited by this method
      */
-    private void createGrid(char[][] grid, JLabel[][] board) {
+    private void createGrid(char[][] grid, JButton[][] board) {
         boardPanel.removeAll();
         Random rGen = new Random();
         ArrayList<char[]> diceCopy = (ArrayList<char[]>) dice.clone();
@@ -327,11 +333,18 @@ public class BoggleGameScreen extends JFrame {
                 char letter = diceCopy.get(randDie)[randFace];
 
                 grid[i][j] = letter;
-                board[i][j] = new JLabel("" + letter, JLabel.CENTER);
+                board[i][j] = new JButton("" + letter);
                 board[i][j].setFont(new Font("Dialog", Font.BOLD, 24));
                 board[i][j].setBorder(BorderFactory.createLineBorder(Color.BLACK));
                 board[i][j].setBackground(Color.WHITE);
-                board[i][j].setOpaque(true);
+
+                final int x = i, y = j;
+                board[i][j].addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        board[x][y].setBackground(Color.GREEN);
+                    }
+                });
 
                 boardPanel.add(board[i][j]);
                 diceCopy.remove(randDie);
