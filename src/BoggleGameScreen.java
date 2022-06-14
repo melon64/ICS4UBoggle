@@ -42,10 +42,13 @@ public class BoggleGameScreen extends JFrame {
     private int score = 0;
     private int score2 = 0;
     private int duration;
-
+    private int minLength;
+    
+    private final ArrayList<String> usedWords = new ArrayList<String>();
+    private final ArrayList<String> dictionary = getDictionaryFromFile();
     private final ArrayList<char[]> dice = readDiceDistribution();
 
-    public BoggleGameScreen(String gameMode, int tournamentScore, int duration) {
+    public BoggleGameScreen(String gameMode, int tournamentScore, int duration, int minLength) {
         // ====================================
         // INITIAL SECTION
         // ====================================
@@ -58,21 +61,17 @@ public class BoggleGameScreen extends JFrame {
         inputPanel = new JPanel();
         inputPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 10));
         inputPanel.setPreferredSize(new Dimension(width, 50));
-        // inputPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 
         timerPanel = new JPanel();
         timerPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 20));
         timerPanel.setMaximumSize(new Dimension(width, 50));
-        // timerPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 
         wordResultPanel = new JPanel();
         wordResultPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
         wordResultPanel.setMaximumSize(new Dimension(width, 50));
-        // wordResultPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 
         boardPanel = new JPanel();
         boardPanel.setLayout(new GridLayout(5, 5));
-        // boardPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         boardPanel.setPreferredSize(new Dimension(width, 300));
 
         scorePanel = new JPanel();
@@ -89,31 +88,6 @@ public class BoggleGameScreen extends JFrame {
         // USER INPUT SECTION
         // ====================================
 
-        ActionListener submitWord = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // search for the word inputed on the board
-                String wordGuessed = wordInput.getText().toUpperCase();
-                ArrayList<Integer[]> path = BoggleAlgorithms.getWordPath(grid, wordGuessed);
-                // TODO - use getIdxOfWord to check if the word is valid
-                if (!path.isEmpty()) {
-                    wordResult.setText(wordGuessed + " is worth " + BoggleAlgorithms.getScore(wordGuessed.length()) + " points");
-                }
-                else {
-                    wordResult.setText(wordGuessed + " is not on the board");
-                }
-
-                // TODO - implement timer logic
-                // try {
-                // Thread.sleep(2000);
-                // } catch (InterruptedException ex) {
-                // System.out.println(ex);
-                // }
-                // startTimer();
-            }
-        };
-
-        // declare components for input
         playerIndication = new JLabel("Player 1", JLabel.CENTER);
         wordLabel = new JLabel("Enter Word: ", JLabel.RIGHT);
         wordInput = new JTextField("", 8);
@@ -124,6 +98,7 @@ public class BoggleGameScreen extends JFrame {
         wordInput2 = new JTextField("", 8);
         submitButton2 = new JButton("GUESS");
         submitButton2.addActionListener(submitWord);
+        this.minLength = minLength;
 
         wordLabel.setPreferredSize(new Dimension(200, 20));
         playerIndication.setPreferredSize(new Dimension(520, 50));
@@ -166,7 +141,7 @@ public class BoggleGameScreen extends JFrame {
         wordResult = new JLabel("ex. AND is worth 6 points", JLabel.CENTER);
         wordResult.setFont(new Font("Dialog", Font.PLAIN, 20));
         wordResult.setPreferredSize(new Dimension(width, 50));
-        // wordResult.setVisible(false);
+        wordResult.setVisible(false);
 
         wordResultPanel.add(wordResult);
 
@@ -205,12 +180,17 @@ public class BoggleGameScreen extends JFrame {
 
         winner.setFont(new Font("Dialog", Font.BOLD, 24));
         winner.setPreferredSize(new Dimension(width, 50));
-        // winner.setVisible(false);
+        winner.setVisible(false);
         restartButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // reset all componenets
                 createGrid(grid, board);
+                score = 0;
+                score2 = 0;
+                scoreLabel.setText("Player 1 Score: " + score);
+                scoreLabel2.setText(playerScore + score2);
+                wordResult.setText("");
             }
         });
 
@@ -234,6 +214,68 @@ public class BoggleGameScreen extends JFrame {
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setVisible(true);
     }
+
+    private ActionListener submitWord = new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            wordResult.setVisible(true);
+
+            // check which player has guessed
+            boolean isPlayerOne = e.getSource() == submitButton;
+
+            // get the word inputed through the text field
+            String wordGuessed = isPlayerOne ? wordInput.getText().toUpperCase() : wordInput2.getText().toUpperCase();
+            
+            // check whether word has already been used
+            boolean usedWord = usedWords.size() > 0 ? BoggleAlgorithms.getIdxOfWord(usedWords, wordGuessed) != -1 : false;
+
+            if (wordGuessed.length() >= minLength && !usedWord) {
+                // use getWordPath to check if the word exists in the maze
+                ArrayList<Integer[]> path = BoggleAlgorithms.getWordPath(grid, wordGuessed);
+
+                // use getIdxOfWord to check if the word is in the dictionary
+                boolean isValidWord = BoggleAlgorithms.getIdxOfWord(dictionary, wordGuessed.toLowerCase()) != -1;
+                usedWords.add(wordGuessed); // add the word to the list of used words
+
+                if (!path.isEmpty() && isValidWord) {
+                    int points = BoggleAlgorithms.getScore(wordGuessed.length());
+                    wordResult.setText(wordGuessed + " is worth " + points + " points");
+                    if (isPlayerOne) {
+                        score += points;
+                        scoreLabel.setText("Player 1 Score: " + score);
+                    } 
+                    else {
+                        score2 += points;
+                        scoreLabel2.setText("Player 2 Score: " + score);
+                    }
+                }
+                else if (isValidWord) {
+                    wordResult.setText(wordGuessed + " is not on the board");
+                }
+                else {
+                    wordResult.setText(wordGuessed + " is not a valid word");
+                }
+            }
+            else {
+                if (usedWord) {
+                    wordResult.setText(wordGuessed + " has already been used");
+                }
+                else {
+                    wordResult.setText(wordGuessed + " is less than the minimum length of " + minLength);
+                }
+            }
+            wordInput.setText("");
+            wordInput2.setText("");
+
+            // TODO - implement timer logic
+            // try {
+            // Thread.sleep(2000);
+            // } catch (InterruptedException ex) {
+            // System.out.println(ex);
+            // }
+            // startTimer();
+        }
+    };
 
     private long startTime = -1;
 
@@ -317,9 +359,32 @@ public class BoggleGameScreen extends JFrame {
                 }
                 diceList.add(dieFaces);
             }
+            in.close();
         } catch (FileNotFoundException exception) {
+            System.out.println(exception);
         }
-        ;
         return diceList;
+    }
+
+    /**
+     * A method that reads in the dictionary from a text file
+     * 
+     * @return An array list containing strings of all the words in the dictionary
+     */
+    private ArrayList<String> getDictionaryFromFile() {
+        ArrayList<String> dictionary = new ArrayList<String>();
+        try {
+            File file = new File("ICS4UBoggle/files/dictionary.txt");
+            Scanner in = new Scanner(file);
+
+            while (in.hasNextLine()) {
+                String nextLine = in.nextLine();
+                dictionary.add(nextLine);
+            }
+            in.close();
+        } catch (FileNotFoundException exception) {
+            System.out.println(exception);
+        }
+        return dictionary;
     }
 }
