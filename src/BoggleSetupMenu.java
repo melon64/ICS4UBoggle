@@ -233,7 +233,7 @@ public class BoggleSetupMenu extends JFrame {
      * @return A list of all the files in the music directory
      */
     public static String[] getMusicFileNames() {
-        File file = new File("ICS4UBoggle/music");
+        File file = new File("ICS4UBoggle/audio");
         String[] fileArr = file.list();
         ArrayList<String> musicList = new ArrayList<String>();
         // The following is the extension that the program is looking for, so it 
