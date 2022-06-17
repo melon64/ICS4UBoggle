@@ -112,9 +112,12 @@ public class BoggleAlgorithms {
         return words;
     }
 
-    // private static ArrayList<String> prefixes3 = getPrefixes("prefixes3");
-    // private static ArrayList<String> prefixes4 = getPrefixes("prefixes4");
-    // private static ArrayList<String> prefixes5 = getPrefixes("prefixes5");
+    private static ArrayList<String> prefixes3 = getPrefixes("prefixes3");
+    private static ArrayList<String> prefixes4 = getPrefixes("prefixes4");
+    private static ArrayList<String> prefixes5 = getPrefixes("prefixes5");
+    private static ArrayList<String> prefixes6 = getPrefixes("prefixes6");
+    private static ArrayList<String> prefixes7 = getPrefixes("prefixes7");
+    private static ArrayList<String> prefixes8 = getPrefixes("prefixes8");
     private static ArrayList<String> combinations = getPrefixes("prefixes");
 
     public static void traverseBoard(char[][] board, boolean[][] visited, int minLength, String word, int currRow, int currCol, ArrayList<String> words, ArrayList<String> dictionary) {
@@ -127,17 +130,30 @@ public class BoggleAlgorithms {
             words.add(word);
             Collections.sort(words);
         }
-
-        // boolean t = (word.length() <= 3 || prefixes3.contains(word.substring(0, 3)));
-        // boolean fo = (word.length() <= 4 || prefixes4.contains(word.substring(0, 4)));
-        // boolean fi = (word.length() <= 5 || prefixes5.contains(word.substring(0, 5)));
-        if (word.length() <= 8 && !combinationExists(word, combinations)) {
-            int[][] adjacentCells = {{currRow-1, currCol-1}, {currRow, currCol-1}, {currRow+1, currCol-1}, {currRow+1, currCol}, {currRow+1, currCol+1}, {currRow, currCol+1}, {currRow-1, currCol+1}, {currRow-1, currCol}};
-            for (int[] pos : adjacentCells) {
-                if (inBounds(board, pos[0], pos[1]) && !visited[pos[0]][pos[1]]) {
-                    traverseBoard(board, visited, minLength, word, pos[0], pos[1], words, dictionary);
+        boolean prefix3Exists = (word.length() >= 3 && getIdxOfWord(prefixes3, word.substring(0, 3).toLowerCase()) != -1);
+        boolean prefix4Exists = (word.length() >= 4 && getIdxOfWord(prefixes4, word.substring(0, 4).toLowerCase()) != -1);
+        boolean prefix5Exists = (word.length() >= 5 && getIdxOfWord(prefixes5, word.substring(0, 5).toLowerCase()) != -1);
+        boolean prefix6Exists = (word.length() >= 6 && getIdxOfWord(prefixes6, word.substring(0, 6).toLowerCase()) != -1);
+        boolean prefix7Exists = (word.length() >= 7 && getIdxOfWord(prefixes7, word.substring(0, 7).toLowerCase()) != -1);
+        boolean prefix8Exists = (word.length() >= 8 && getIdxOfWord(prefixes8, word.substring(0, 8).toLowerCase()) != -1);
+        if (word.length() < 3 || (prefix3Exists && !combinationExists(word, combinations))) {
+            if (word.length() < 4 || (prefix4Exists) && word.length() <= 9) {
+                if (word.length() < 5 || (prefix5Exists)) {
+                    if (word.length() < 6 || (prefix6Exists)) {
+                        if (word.length() < 7 || (prefix7Exists)) {
+                            if (word.length() < 8 || (prefix8Exists)) {
+                                int[][] adjacentCells = {{currRow-1, currCol-1}, {currRow, currCol-1}, {currRow+1, currCol-1}, {currRow+1, currCol}, {currRow+1, currCol+1}, {currRow, currCol+1}, {currRow-1, currCol+1}, {currRow-1, currCol}};
+                                for (int[] pos : adjacentCells) {
+                                    if (inBounds(board, pos[0], pos[1]) && !visited[pos[0]][pos[1]]) {
+                                        traverseBoard(board, visited, minLength, word, pos[0], pos[1], words, dictionary);
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
+
         }
 
         word = "" + word.charAt(word.length()-1);
