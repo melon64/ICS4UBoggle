@@ -298,8 +298,7 @@ public class BoggleGameScreen extends JFrame {
                     if (isPlayerOne) {
                         score += points;
                         scoreLabel.setText("Player 1 Score: " + score);
-                    } 
-                    else {
+                    } else {
                         score2 += points;
                         scoreLabel2.setText("Player 2 Score: " + score);
                     }
@@ -324,6 +323,7 @@ public class BoggleGameScreen extends JFrame {
 
             // implement timer logic
             if (wordAccepted) {
+                new BoggleMusicPlayer("ICS4UBoggle/audio/sound_effects/", "Correct", false);
                 try {
                     Thread.sleep(1000);
                 } 
@@ -331,6 +331,8 @@ public class BoggleGameScreen extends JFrame {
                     System.out.println(ex);
                 }
                 startTimer();
+            } else {
+                new BoggleMusicPlayer("ICS4UBoggle/audio/sound_effects/", "Incorrect", false);
             }
         }
     };
