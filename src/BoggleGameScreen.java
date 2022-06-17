@@ -173,7 +173,7 @@ public class BoggleGameScreen extends JFrame {
         int[] wordLengths = new int[maxDisplayedLength-minLength+1];
         wordLengthsLabels = new JLabel[maxDisplayedLength-minLength+1];
         ArrayList<String> possibleWords = BoggleAlgorithms.getAllWords(grid, dictionary, minLength);
-        System.out.println(possibleWords.toString());
+        // System.out.println(possibleWords.toString());
         int totalWords = possibleWords.size();
         
         wordResult = new JLabel("Click on the letters to form a word", JLabel.CENTER);
@@ -394,8 +394,7 @@ public class BoggleGameScreen extends JFrame {
      * This method alternates turns between the two players
      */
     private void changeTurn() {
-        String currTurn = turnLabel.getText();
-        String currPlayer = currTurn.substring(0, currTurn.length()-7);
+        String currPlayer = getCurrentPlayer();
         if (currPlayer.equals(playerIndication.getText())) {
             turnLabel.setText(playerIndication2.getText() + "'s Turn");
             submitButton.setEnabled(false);
@@ -458,14 +457,26 @@ public class BoggleGameScreen extends JFrame {
                         if (board[x][y].getBackground() == Color.GREEN && x == lastCoords[0] && y == lastCoords[1]) {
                             board[x][y].setBackground(Color.WHITE);
                             path.remove(path.size()-1);
+
+                            if (getCurrentPlayer().equals(playerIndication.getText())) {
+                                wordInput.setText(wordInput.getText().substring(0, wordInput.getText().length()-1));
+                            }
+                            else {
+                                wordInput2.setText(wordInput2.getText().substring(0, wordInput2.getText().length()-1));
+                            }
                         }
                         else if (board[x][y].getBackground() == Color.WHITE) {
                             if (path.isEmpty() || isAdjacent(x, y, lastCoords[0], lastCoords[1])) {
                                 board[x][y].setBackground(Color.GREEN);
                                 int[] coords = new int[]{x, y};
-                                if (!path.contains(coords)) {
-                                    path.add(coords);
+                                path.add(coords);
+ 
+                                if (getCurrentPlayer().equals(playerIndication.getText())) {
+                                    wordInput.setText(wordInput.getText() + grid[x][y]);
                                 }
+                                else {
+                                    wordInput2.setText(wordInput2.getText() + grid[x][y]);
+                                }  
                             }
                         }
                         // for (int[] p : path) {
@@ -500,6 +511,11 @@ public class BoggleGameScreen extends JFrame {
         return false;
     }
 
+    private String getCurrentPlayer() {
+        String currTurn = turnLabel.getText();
+        String currPlayer = currTurn.substring(0, currTurn.length()-7);
+        return currPlayer;
+    }
     /**
      * A method that reads in the dice distributions from a text file
      * 

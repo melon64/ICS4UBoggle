@@ -112,38 +112,49 @@ public class BoggleAlgorithms {
         return words;
     }
 
-    private static ArrayList<String> prefixes3 = getPrefixes("prefixes3");
-    private static ArrayList<String> prefixes4 = getPrefixes("prefixes4");
-    private static ArrayList<String> prefixes5 = getPrefixes("prefixes5");
-    private static ArrayList<String> prefixes6 = getPrefixes("prefixes6");
-    private static ArrayList<String> prefixes7 = getPrefixes("prefixes7");
-    private static ArrayList<String> prefixes8 = getPrefixes("prefixes8");
-    private static ArrayList<String> combinations = getPrefixes("prefixes");
+    private static ArrayList<String> prefixes3 = getPrefixes("prefixes/prefixes3");
+    private static ArrayList<String> prefixes4 = getPrefixes("prefixes/prefixes4");
+    private static ArrayList<String> prefixes5 = getPrefixes("prefixes/prefixes5");
+    private static ArrayList<String> prefixes6 = getPrefixes("prefixes/prefixes6");
+    private static ArrayList<String> prefixes7 = getPrefixes("prefixes/prefixes7");
+    private static ArrayList<String> prefixes8 = getPrefixes("prefixes/prefixes8");
+    private static ArrayList<String> combinations = getPrefixes("combinations");
 
     public static void traverseBoard(char[][] board, boolean[][] visited, int minLength, String word, int currRow, int currCol, ArrayList<String> words, ArrayList<String> dictionary) {
+        // Set current cell as visited
         visited[currRow][currCol] = true;
+
+        // Concatenate the letter at the cell to end of the word
         word = word + board[currRow][currCol];
-        System.out.println(word);
         
         // If the word exists in the dictionary, is not already in the list, and at least the minimum length
         if (getIdxOfWord(dictionary, word) != -1 && getIdxOfWord(words, word) == -1 && word.length() >= minLength) {
             words.add(word);
+            // Sort the list to be able to use binary search
             Collections.sort(words);
         }
-        boolean prefix3Exists = (word.length() >= 3 && getIdxOfWord(prefixes3, word.substring(0, 3).toLowerCase()) != -1);
-        boolean prefix4Exists = (word.length() >= 4 && getIdxOfWord(prefixes4, word.substring(0, 4).toLowerCase()) != -1);
-        boolean prefix5Exists = (word.length() >= 5 && getIdxOfWord(prefixes5, word.substring(0, 5).toLowerCase()) != -1);
-        boolean prefix6Exists = (word.length() >= 6 && getIdxOfWord(prefixes6, word.substring(0, 6).toLowerCase()) != -1);
-        boolean prefix7Exists = (word.length() >= 7 && getIdxOfWord(prefixes7, word.substring(0, 7).toLowerCase()) != -1);
-        boolean prefix8Exists = (word.length() >= 8 && getIdxOfWord(prefixes8, word.substring(0, 8).toLowerCase()) != -1);
-        if (word.length() < 3 || (prefix3Exists && !combinationExists(word, combinations))) {
-            if (word.length() < 4 || (prefix4Exists) && word.length() <= 9) {
+
+        boolean prefix3Exists = (word.length() >= 3 && getIdxOfWord(prefixes3, word.substring(0, 3)) != -1);
+        boolean prefix4Exists = (word.length() >= 4 && getIdxOfWord(prefixes4, word.substring(0, 4)) != -1);
+        boolean prefix5Exists = (word.length() >= 5 && getIdxOfWord(prefixes5, word.substring(0, 5)) != -1);
+        boolean prefix6Exists = (word.length() >= 6 && getIdxOfWord(prefixes6, word.substring(0, 6)) != -1);
+        boolean prefix7Exists = (word.length() >= 7 && getIdxOfWord(prefixes7, word.substring(0, 7)) != -1);
+        boolean prefix8Exists = (word.length() >= 8 && getIdxOfWord(prefixes8, word.substring(0, 8)) != -1);
+        
+        // Conditions to continue on the path: 
+        // - the prefix at the current length possibly forms a word,  
+        // - the two letter combinations that never form a word does not exist, 
+        // - the length of the word does not exceed 10
+        if (word.length() < 3 || prefix3Exists && !combinationExists(word, combinations) && word.length() <= 9) {
+            if (word.length() < 4 || (prefix4Exists)) {
                 if (word.length() < 5 || (prefix5Exists)) {
                     if (word.length() < 6 || (prefix6Exists)) {
                         if (word.length() < 7 || (prefix7Exists)) {
                             if (word.length() < 8 || (prefix8Exists)) {
+                                // Recurse through each of the 8 adjacent cells
                                 int[][] adjacentCells = {{currRow-1, currCol-1}, {currRow, currCol-1}, {currRow+1, currCol-1}, {currRow+1, currCol}, {currRow+1, currCol+1}, {currRow, currCol+1}, {currRow-1, currCol+1}, {currRow-1, currCol}};
                                 for (int[] pos : adjacentCells) {
+                                    // If the adjacent cell is within the bounds and not visited
                                     if (inBounds(board, pos[0], pos[1]) && !visited[pos[0]][pos[1]]) {
                                         traverseBoard(board, visited, minLength, word, pos[0], pos[1], words, dictionary);
                                     }
@@ -156,19 +167,12 @@ public class BoggleAlgorithms {
 
         }
 
+        // Remove the last character of the word
         word = "" + word.charAt(word.length()-1);
+
+        // Set the current cell as unvisited
         visited[currRow][currCol] = false;
     }
-    
-    // public static boolean prefixExists(String word, ArrayList<String> dictionary) {
-    //     for (int i = 1; i <= word.length(); i++) {
-    //         int index = getIdxOfWord(dictionary, word.substring(0, i));
-    //         if (index != -1 && dictionary.get(index).length() > 3) {
-    //             return true;
-    //         }
-    //     }
-    //     return false;
-    // }
 
     /**
      * This method checks whether a coordinate is within the bounds of the board
@@ -177,17 +181,22 @@ public class BoggleAlgorithms {
      * @param dictionary The list of combinations of letters that can't exist in a word
      * @return    A boolean of whether the combination exists
      */
-    public static boolean combinationExists(String word, ArrayList<String> dictionary) {
+    public static boolean combinationExists(String word, ArrayList<String> combinations) {
+        // If the length of the word is less than 2
         if (word.length() < 2) {
-            return false;
+            return false; // The two letter combination cannot possibly exist
         }
         else {
+            // Iterate through every two letter combination in the word
             for (int i = 0; i < word.length()-1; i++) {
-                if (getIdxOfWord(dictionary, word.substring(i, i+2)) != -1) {
-                    return true;
+                // If the combination exists in the list
+                if (getIdxOfWord(combinations, word.substring(i, i+2)) != -1) {
+                    // Combination has been found
+                    return true; 
                 }
             }
         }
+        // Combination has not been found
         return false;
     }
 
@@ -204,15 +213,15 @@ public class BoggleAlgorithms {
     }
 
     /**
-     * This method reads the prefixes from the files 
+     * This method reads the words from the files and stores them in a list
      * 
-     * @param prefixName The name of the file to be read from
+     * @param fileName The name of the file to be read from
      * @return    A list of all the prefixes
      */
-    public static ArrayList<String> getPrefixes(String prefixName) {
+    public static ArrayList<String> getPrefixes(String fileName) {
         ArrayList<String> prefixList = new ArrayList<String>();
         try {
-            File file = new File("ICS4UBoggle/files/" + prefixName + ".txt");
+            File file = new File("ICS4UBoggle/files/" + fileName + ".txt");
             Scanner in = new Scanner(file);
             String prefixes = "";
 
