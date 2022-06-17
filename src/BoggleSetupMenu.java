@@ -93,8 +93,8 @@ public class BoggleSetupMenu extends JFrame {
         constraints.anchor = GridBagConstraints.EAST;
         settingsPanel.add(wordLengthLabel, constraints);
         
-        // Create a slider which ranges from 2 to 6 and starts at 3
-        wordLengthSlider = new JSlider(JSlider.HORIZONTAL, 2, 6, 3);
+        // Create a slider which ranges from 3 to 6 and starts at 3
+        wordLengthSlider = new JSlider(JSlider.HORIZONTAL, 3, 6, 3);
         wordLengthSlider.setPreferredSize(new Dimension(100, 45));
         wordLengthSlider.setMajorTickSpacing(1);
         wordLengthSlider.setPaintTicks(true);

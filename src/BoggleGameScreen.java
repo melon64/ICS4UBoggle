@@ -48,9 +48,11 @@ public class BoggleGameScreen extends JFrame {
     private int score = 0;
     private int score2 = 0;
     private int passedTurns = 0;
+    private int totalWords;
     private int duration;
     private int currDuration;
     private int minLength;
+    private int[] wordLengths;
     
     private final ArrayList<String> usedWords = new ArrayList<String>();
     private final ArrayList<String> dictionary = getDictionaryFromFile();
@@ -172,11 +174,11 @@ public class BoggleGameScreen extends JFrame {
         // WORD RESULT SECTION
         // ====================================
 
-        int[] wordLengths = new int[maxDisplayedLength-minLength+1];
+        wordLengths = new int[maxDisplayedLength-minLength+1];
         wordLengthsLabels = new JLabel[maxDisplayedLength-minLength+1];
         ArrayList<String> possibleWords = BoggleAlgorithms.getAllWords(grid, dictionary, minLength);
         // System.out.println(possibleWords.toString());
-        int totalWords = possibleWords.size();
+        totalWords = possibleWords.size();
         
         wordResult = new JLabel("Click on the letters to form a word", JLabel.CENTER);
         totalWordsLabel = new JLabel("0/"+totalWords+" WORDS", JLabel.CENTER);
@@ -188,7 +190,7 @@ public class BoggleGameScreen extends JFrame {
         
         wordResultPanel.add(wordResult);
         wordResultPanel.add(totalWordsLabel);
-        assignWordLengths(possibleWords, wordLengths);
+        assignWordLengths(possibleWords);
 
         // ====================================
         // SCORE SECTION
@@ -227,22 +229,31 @@ public class BoggleGameScreen extends JFrame {
             @Override
                 public void actionPerformed(ActionEvent e) {
                 // TODO - add sfx
-                // reset the board
+                // Reset the timer
+                startTimer();
+
+                // Reset the board
                 createGrid(grid, board);
+                
                 shakeUpBoard.setEnabled(false);
             }
         });
         restartButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // create warning with sfx
-                // reset all componenets
+                // TODO - create warning with sfx
+                // Reset all componenets
                 createGrid(grid, board);
+                ArrayList<String> possibleWords = BoggleAlgorithms.getAllWords(grid, dictionary, minLength);
+                totalWords = possibleWords.size();
+                totalWordsLabel.setText("0/"+totalWords+" WORDS");
+                assignWordLengths(possibleWords);
+
                 score = 0;
                 score2 = 0;
                 scoreLabel.setText("Player 1 Score: " + score);
                 scoreLabel2.setText(playerScore + score2);
-                wordResult.setText("");
+                wordResult.setText("Click on the letters to form a word");
             }
         });
 
@@ -295,6 +306,13 @@ public class BoggleGameScreen extends JFrame {
                 if (!path.isEmpty() && isValidWord) {
                     wordAccepted = true;
                     usedWords.add(wordGuessed); // add the word to the list of used words
+
+                    // Display the amount of words left 
+                    int index = wordGuessed.length() - (maxDisplayedLength-wordLengths.length+1);
+                    totalWordsLabel.setText(usedWords.size()+"/"+totalWords + " WORDS");
+                    wordLengths[index]--;
+                    wordLengthsLabels[index].setText(wordGuessed.length() + ": " + wordLengths[index]);
+
                     int points = BoggleAlgorithms.getScore(wordGuessed.length());
                     wordResult.setText(wordGuessed + " is worth " + points + " points");
                     if (isPlayerOne) {
@@ -320,15 +338,8 @@ public class BoggleGameScreen extends JFrame {
                     wordResult.setText(wordGuessed + " is less than the minimum length of " + minLength);
                 }
             }
-            wordInput.setText("");
-            wordInput2.setText("");
-            path.clear(); // Clear the current path
-            // Reset the colour of the board
-            for (int i = 0; i < board.length; i++) {
-                for (int j = 0; j < board[0].length; j++) {
-                    board[i][j].setBackground(Color.WHITE);
-                }
-            }
+
+            resetGuess();
 
             // Implement timer logic
             if (wordAccepted) {
@@ -347,20 +358,29 @@ public class BoggleGameScreen extends JFrame {
      * from minLength to maxDisplayedLength, inclusive
      *
      * @param words A list containing all the possible words
-     * @param wordLengths An array that will contain how many words exist at each possible length
      */
-    private void assignWordLengths(ArrayList<String> words, int[] wordLengths) {
+    private void assignWordLengths(ArrayList<String> words) {
+        Arrays.fill(wordLengths, 0);
         for (String word : words) {
             int index = word.length() - (maxDisplayedLength-wordLengths.length+1);
+            if (word.length() > 8) {
+                index -= word.length()-maxDisplayedLength;
+            } 
             wordLengths[index]++;
         }
-        System.out.println(Arrays.toString(wordLengths));
+        // System.out.println(Arrays.toString(wordLengths));
+
+        wordResultPanel.removeAll();
+        wordResultPanel.add(wordResult);
+        wordResultPanel.add(totalWordsLabel);
+
         for (int i = 0; i < wordLengths.length; i++) {
             int currLength = maxDisplayedLength-wordLengths.length+i+1;
             wordLengthsLabels[i] = new JLabel(currLength + ": " + wordLengths[i], JLabel.CENTER);
             wordLengthsLabels[i].setFont(new Font("Dialog", Font.PLAIN, 16));
             wordLengthsLabels[i].setPreferredSize(new Dimension(width/wordLengths.length-20, 20));
             wordResultPanel.add(wordLengthsLabels[i]);
+            wordResultPanel.revalidate();
         }
     }
 
@@ -397,6 +417,7 @@ public class BoggleGameScreen extends JFrame {
      * This method alternates turns between the two players
      */
     private void changeTurn() {
+        resetGuess();
         String currPlayer = getCurrentPlayer();
         if (currPlayer.equals(playerIndication.getText())) {
             turnLabel.setText(playerIndication2.getText() + "'s Turn");
@@ -410,13 +431,26 @@ public class BoggleGameScreen extends JFrame {
         }
     }
 
+    private void resetGuess() {
+        wordInput.setText("");
+        wordInput2.setText("");
+        path.clear(); // Clear the current path
+        // Reset the colour of the board
+        for (int i = 0; i < board.length; i++) {
+            for (int j = 0; j < board[0].length; j++) {
+                board[i][j].setBackground(Color.WHITE);
+            }
+        }
+    }
+
     /**
      * This method starts a timer that indicates the amount of time left a player has to guess
      */
     private void startTimer() {
+        // Reset the timer
         currDuration = duration;
         startTime = -1;
-        
+
         if (timer.isRunning()) {
             timer.stop();
             changeTurn();
@@ -458,35 +492,42 @@ public class BoggleGameScreen extends JFrame {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         int[] lastCoords = path.isEmpty() ? new int[]{0, 0} : path.get(path.size()-1);
-                        if (board[x][y].getBackground() == Color.GREEN && x == lastCoords[0] && y == lastCoords[1]) {
-                            board[x][y].setBackground(Color.WHITE);
-                            path.remove(path.size()-1);
-
-                            if (getCurrentPlayer().equals(playerIndication.getText())) {
-                                wordInput.setText(wordInput.getText().substring(0, wordInput.getText().length()-1));
-                            }
-                            else {
-                                wordInput2.setText(wordInput2.getText().substring(0, wordInput2.getText().length()-1));
-                            }
-                        }
-                        else if (board[x][y].getBackground() == Color.WHITE) {
-                            if (path.isEmpty() || isAdjacent(x, y, lastCoords[0], lastCoords[1])) {
-                                board[x][y].setBackground(Color.GREEN);
-                                int[] coords = new int[]{x, y};
-                                path.add(coords);
- 
+                        // If current cell is being used in the path and is the last inputed letter
+                        if (!getCurrentPlayer().equals("Computer Player")) {
+                            if (board[x][y].getBackground() == Color.GREEN && x == lastCoords[0] && y == lastCoords[1]) {
+                                // Undo selection
+                                board[x][y].setBackground(Color.WHITE);
+                                if (!path.isEmpty()) {
+                                    path.remove(path.size()-1);
+                                }
+    
+                                // Display the player's truncated word path 
                                 if (getCurrentPlayer().equals(playerIndication.getText())) {
-                                    wordInput.setText(wordInput.getText() + grid[x][y]);
+                                    wordInput.setText(wordInput.getText().substring(0, wordInput.getText().length()-1));
                                 }
                                 else {
-                                    wordInput2.setText(wordInput2.getText() + grid[x][y]);
-                                }  
+                                    wordInput2.setText(wordInput2.getText().substring(0, wordInput2.getText().length()-1));
+                                }
+                            }
+                            // If current cell has not been used in the path
+                            else if (board[x][y].getBackground() == Color.WHITE) { 
+                                // If the path is empty or the cell selected is adjacent to the last selected letter
+                                if (path.isEmpty() || isAdjacent(x, y, lastCoords[0], lastCoords[1])) {
+                                    // Add letter to the path
+                                    board[x][y].setBackground(Color.GREEN);
+                                    int[] coords = new int[]{x, y};
+                                    path.add(coords);
+                                    
+                                    // Display the concatenated player's word path 
+                                    if (getCurrentPlayer().equals(playerIndication.getText())) {
+                                        wordInput.setText(wordInput.getText() + grid[x][y]);
+                                    }
+                                    else {
+                                        wordInput2.setText(wordInput2.getText() + grid[x][y]);
+                                    }  
+                                }
                             }
                         }
-                        // for (int[] p : path) {
-                        //     System.out.print("[" + p[0] + ", " + p[1] + "], ");
-                        // }
-                        // System.out.println();
                     }
                 });
 
@@ -515,11 +556,17 @@ public class BoggleGameScreen extends JFrame {
         return false;
     }
 
+    /**
+     * A method that gets the player who has the current turn
+     * 
+     * @return A string of the player's name
+     */
     private String getCurrentPlayer() {
         String currTurn = turnLabel.getText();
         String currPlayer = currTurn.substring(0, currTurn.length()-7);
         return currPlayer;
     }
+
     /**
      * A method that reads in the dice distributions from a text file
      * 
