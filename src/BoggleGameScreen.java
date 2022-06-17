@@ -49,6 +49,7 @@ public class BoggleGameScreen extends JFrame {
     private int score2 = 0;
     private int passedTurns = 0;
     private int duration;
+    private int currDuration;
     private int minLength;
     
     private final ArrayList<String> usedWords = new ArrayList<String>();
@@ -155,6 +156,7 @@ public class BoggleGameScreen extends JFrame {
         timerLabel.setMaximumSize(new Dimension(width, 100));
         // timerLabel.setBorder(BorderFactory.createLineBorder(Color.black, 0));
         this.duration = duration * 1000; // convert seconds to milliseconds
+        currDuration = duration * 1000;
         startTimer();
 
         timerPanel.add(turnLabel);
@@ -300,7 +302,7 @@ public class BoggleGameScreen extends JFrame {
                         scoreLabel.setText("Player 1 Score: " + score);
                     } else {
                         score2 += points;
-                        scoreLabel2.setText("Player 2 Score: " + score);
+                        scoreLabel2.setText("Player 2 Score: " + score2);
                     }
                 }
                 else if (isValidWord) {
@@ -320,16 +322,17 @@ public class BoggleGameScreen extends JFrame {
             }
             wordInput.setText("");
             wordInput2.setText("");
+            path.clear(); // Clear the current path
+            // Reset the colour of the board
+            for (int i = 0; i < board.length; i++) {
+                for (int j = 0; j < board[0].length; j++) {
+                    board[i][j].setBackground(Color.WHITE);
+                }
+            }
 
-            // implement timer logic
+            // Implement timer logic
             if (wordAccepted) {
                 new BoggleMusicPlayer("ICS4UBoggle/audio/sound_effects/", "Correct", false);
-                try {
-                    Thread.sleep(1000);
-                } 
-                catch (InterruptedException ex) {
-                    System.out.println(ex);
-                }
                 startTimer();
             } else {
                 new BoggleMusicPlayer("ICS4UBoggle/audio/sound_effects/", "Incorrect", false);
@@ -370,8 +373,8 @@ public class BoggleGameScreen extends JFrame {
             }
             long now = System.currentTimeMillis();
             long clockTime = now - startTime;
-            if (clockTime >= duration) {
-                clockTime = duration;
+            if (clockTime >= currDuration) {
+                clockTime = currDuration;
                 timer.stop();
                 if (passedTurns == 4) { // Both players have passed twice
                     passedTurns = 0;
@@ -380,12 +383,12 @@ public class BoggleGameScreen extends JFrame {
                 }
                 else {
                     passedTurns++;
-        
                 }
                 changeTurn();
+                startTimer();
             }
             long elapsed = now - startTime;
-            int secondsLeft = (int) ((duration - elapsed + 500) / 1000);
+            int secondsLeft = (int) ((currDuration - elapsed + 500) / 1000);
             timerLabel.setText("Time Left to Guess: " + secondsLeft);
         }
     });
@@ -411,15 +414,16 @@ public class BoggleGameScreen extends JFrame {
      * This method starts a timer that indicates the amount of time left a player has to guess
      */
     private void startTimer() {
-        if (!timer.isRunning()) {
-            startTime = -1;
-            timer.setInitialDelay(0);
-            timer.start();
-        }
-        else {
+        currDuration = duration;
+        startTime = -1;
+        
+        if (timer.isRunning()) {
             timer.stop();
             changeTurn();
         }
+        
+        timer.setInitialDelay(0);
+        timer.start();
     }
 
     private ArrayList<int[]> path = new ArrayList<int[]>(); 
