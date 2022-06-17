@@ -157,11 +157,11 @@ public class BoggleSetupMenu extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 // create the main game screen GUI when this button is clicked
                 setVisible(false);
-                String gameMode = modeChoiceBox.getSelectedItem().toString();
-                int tournamentScore = (int) scoreSpinner.getValue();
-                int duration = (int) timerSpinner.getValue();
-                int minLength = wordLengthSlider.getValue();
-                String track = musicChoiceBox.getSelectedItem().toString();
+                String gameMode = getGameMode();
+                int tournamentScore = getTournamentScore();
+                int duration = getTimerDuration();
+                int minLength = getMinLength();
+                String track = getTrack();
                 new BoggleGameScreen(gameMode, tournamentScore, duration, minLength, track);
             }
         });
@@ -180,6 +180,51 @@ public class BoggleSetupMenu extends JFrame {
         setResizable(false);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setVisible(true);
+    }
+
+    /**
+     * This function gets the game mode
+     * 
+     * @return A string indicating the game mode
+     */
+    public String getGameMode() {
+        return modeChoiceBox.getSelectedItem().toString();
+    }
+
+    /**
+     * This function gets the tournament score
+     * 
+     * @return An integer representing the tournament score
+     */
+    public int getTournamentScore() {
+        return (int) scoreSpinner.getValue();
+    }
+
+    /**
+     * This function gets the timer duration
+     * 
+     * @return An integer representing the timer duration value
+     */
+    public int getTimerDuration() {
+        return (int) timerSpinner.getValue();
+    }
+
+    /**
+     * This function gets the minimum length of the word
+     * 
+     * @return An integer indicating the minimum length valid words must be
+     */
+    public int getMinLength() {
+        return wordLengthSlider.getValue();
+    }
+
+    /**
+     * This function gets the specified music track
+     * 
+     * @return A string of the track name
+     */
+    public String getTrack() {
+        return musicChoiceBox.getSelectedItem().toString();
     }
 
     /**

@@ -1,12 +1,14 @@
 package ICS4UBoggle.src;
 
+import java.io.*;
+import java.util.*;
+
 /**
  * Names: Adarsh P, Larris X, Felix X, and Hubert X
  * Date: June 7, 2022
  * Description: A program that contains a number of useful algorithms for the game of Boggle
  */
 
-import java.util.ArrayList;
 
 public class BoggleAlgorithms {
     /**
@@ -87,6 +89,126 @@ public class BoggleAlgorithms {
             // position yet, return false
             return new ArrayList<Integer[]>();
         }
+    }
+
+    /**
+     * This method finds all the possible words on a Boggle board
+     *
+     * @param board The letters that are currently on the board
+     * @param dictionary The list of valid words to check for on the board
+     * @return      An array list of words that can be formed on the board
+     *              returns an empty array list if the word isn't found
+     */
+    public static ArrayList<String> getAllWords(char[][] board, ArrayList<String> dictionary, int minLength) {
+        boolean[][] visited = new boolean[board.length][board[0].length];
+        String word = "";
+        ArrayList<String> words = new ArrayList<String>();
+        
+        for (int i = 0; i < board.length; i++) {
+            for (int j = 0; j < board[0].length; j++) {
+                traverseBoard(board, visited, minLength, word, i, j, words, dictionary);
+            }
+        }
+        return words;
+    }
+
+    // private static ArrayList<String> prefixes3 = getPrefixes("prefixes3");
+    // private static ArrayList<String> prefixes4 = getPrefixes("prefixes4");
+    // private static ArrayList<String> prefixes5 = getPrefixes("prefixes5");
+    private static ArrayList<String> combinations = getPrefixes("prefixes");
+
+    public static void traverseBoard(char[][] board, boolean[][] visited, int minLength, String word, int currRow, int currCol, ArrayList<String> words, ArrayList<String> dictionary) {
+        visited[currRow][currCol] = true;
+        word = word + board[currRow][currCol];
+        System.out.println(word);
+        
+        // If the word exists in the dictionary, is not already in the list, and at least the minimum length
+        if (getIdxOfWord(dictionary, word) != -1 && getIdxOfWord(words, word) == -1 && word.length() >= minLength) {
+            words.add(word);
+            Collections.sort(words);
+        }
+
+        // boolean t = (word.length() <= 3 || prefixes3.contains(word.substring(0, 3)));
+        // boolean fo = (word.length() <= 4 || prefixes4.contains(word.substring(0, 4)));
+        // boolean fi = (word.length() <= 5 || prefixes5.contains(word.substring(0, 5)));
+        if (word.length() <= 8 && !combinationExists(word, combinations)) {
+            int[][] adjacentCells = {{currRow-1, currCol-1}, {currRow, currCol-1}, {currRow+1, currCol-1}, {currRow+1, currCol}, {currRow+1, currCol+1}, {currRow, currCol+1}, {currRow-1, currCol+1}, {currRow-1, currCol}};
+            for (int[] pos : adjacentCells) {
+                if (inBounds(board, pos[0], pos[1]) && !visited[pos[0]][pos[1]]) {
+                    traverseBoard(board, visited, minLength, word, pos[0], pos[1], words, dictionary);
+                }
+            }
+        }
+
+        word = "" + word.charAt(word.length()-1);
+        visited[currRow][currCol] = false;
+    }
+    
+    // public static boolean prefixExists(String word, ArrayList<String> dictionary) {
+    //     for (int i = 1; i <= word.length(); i++) {
+    //         int index = getIdxOfWord(dictionary, word.substring(0, i));
+    //         if (index != -1 && dictionary.get(index).length() > 3) {
+    //             return true;
+    //         }
+    //     }
+    //     return false;
+    // }
+
+    /**
+     * This method checks whether a coordinate is within the bounds of the board
+     * 
+     * @param word The word to check for the combination within
+     * @param dictionary The list of combinations of letters that can't exist in a word
+     * @return    A boolean of whether the combination exists
+     */
+    public static boolean combinationExists(String word, ArrayList<String> dictionary) {
+        if (word.length() < 2) {
+            return false;
+        }
+        else {
+            for (int i = 0; i < word.length()-1; i++) {
+                if (getIdxOfWord(dictionary, word.substring(i, i+2)) != -1) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * This method checks whether a coordinate is within the bounds of the board
+     * 
+     * @param board The name of the file to be read from
+     * @param x The x coordinate of the board
+     * @param y The y coordinate of the board
+     * @return    A boolean of whether the coordinates are within the bounds
+     */
+    public static boolean inBounds(char[][] board, int x, int y) {
+        return !(x < 0 || y < 0 || x >= board.length || y >= board[0].length);
+    }
+
+    /**
+     * This method reads the prefixes from the files 
+     * 
+     * @param prefixName The name of the file to be read from
+     * @return    A list of all the prefixes
+     */
+    public static ArrayList<String> getPrefixes(String prefixName) {
+        ArrayList<String> prefixList = new ArrayList<String>();
+        try {
+            File file = new File("ICS4UBoggle/files/" + prefixName + ".txt");
+            Scanner in = new Scanner(file);
+            String prefixes = "";
+
+            while (in.hasNextLine()) {
+                prefixes = in.nextLine();
+            }
+            Collections.addAll(prefixList, prefixes.split(" ")); 
+            in.close();
+        } catch (FileNotFoundException exception) {
+            System.out.println(exception);
+        }
+        return prefixList;
     }
 
     /**
@@ -177,6 +299,11 @@ public class BoggleAlgorithms {
      * @return           The index of the word in dictionary; return -1 if word isn't found
      */
     public static int getIdxOfWord(ArrayList<String> dictionary, String word) {
+        // Return not found immediately if the list is empty
+        if (dictionary.isEmpty()) {
+            return -1;
+        }
+
         // Mantain both a startIdx and an endIdx - these values represent the end bounds 
         // (inclusive) of the range in whcih the word may be found
         int startIdx = 0;
@@ -186,7 +313,7 @@ public class BoggleAlgorithms {
         while (endIdx - startIdx > 1) {
             // Use the floor function to calculate currIdx to get consistent behaviour
             int currIdx = (int)Math.floor((startIdx + endIdx) / 2);
-            int comparison = dictionary.get(currIdx).compareTo(word);
+            int comparison = dictionary.get(currIdx).compareToIgnoreCase(word);
             
             if (comparison == 0) {
                 // If the index you are searcing contains the word, return that index
@@ -203,10 +330,10 @@ public class BoggleAlgorithms {
         }
 
         // After the loop has finished executing, search the remaining two indices for the word
-        if (dictionary.get(startIdx).equals(word)) {
+        if (dictionary.get(startIdx).equalsIgnoreCase(word)) {
             // If the word is located at the first of the two indices, return that index
             return startIdx;
-        } else if (dictionary.get(endIdx).equals(word)) {
+        } else if (dictionary.get(endIdx).equalsIgnoreCase(word)) {
             // If the word is located at the second of the two indices, return that index
             return endIdx;
         } else {

@@ -18,6 +18,7 @@ public class BoggleGameScreen extends JFrame {
     JPanel timerPanel;
     JPanel wordResultPanel;
     JPanel boardPanel;
+    JPanel wordsPanel;
     JPanel scorePanel;
     JPanel outputPanel;
     JLabel playerIndication;
@@ -28,19 +29,25 @@ public class BoggleGameScreen extends JFrame {
     JTextField wordInput2;
     JButton submitButton;
     JButton submitButton2;
+    JLabel turnLabel;
     JLabel timerLabel;
+    JLabel totalWordsLabel;
     JLabel wordResult;
+    JLabel[] wordLengthsLabels;
     JLabel scoreLabel;
     JLabel scoreLabel2;
     JLabel tournamentScoreLabel;
     JLabel winner;
+    JButton shakeUpBoard;
     JButton restartButton;
 
     private char[][] grid = new char[5][5];
     private JButton[][] board = new JButton[5][5];
 
+    private int width = 1080, height = 960;
     private int score = 0;
     private int score2 = 0;
+    private int passedTurns = 0;
     private int duration;
     private int minLength;
     
@@ -53,22 +60,23 @@ public class BoggleGameScreen extends JFrame {
         // INITIAL SECTION
         // ====================================
 
-        int width = 1080, height = 960;
         setTitle("Boggle Game Screen");
         setSize(width, height);
         setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
 
         inputPanel = new JPanel();
         inputPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 10));
-        inputPanel.setPreferredSize(new Dimension(width, 50));
-
+        inputPanel.setPreferredSize(new Dimension(width, 100));
+        inputPanel.setMaximumSize(new Dimension(width, 100));
+        
         timerPanel = new JPanel();
-        timerPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 20));
+        timerPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
         timerPanel.setMaximumSize(new Dimension(width, 50));
 
         wordResultPanel = new JPanel();
         wordResultPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
-        wordResultPanel.setMaximumSize(new Dimension(width, 50));
+        wordResultPanel.setPreferredSize(new Dimension(width, 140));
+        wordResultPanel.setMaximumSize(new Dimension(width, 140));
 
         boardPanel = new JPanel();
         boardPanel.setLayout(new GridLayout(5, 5));
@@ -88,7 +96,7 @@ public class BoggleGameScreen extends JFrame {
         // MUSIC SECTION
         // ====================================
 
-        BoggleMusicPlayer musicPlayer = new BoggleMusicPlayer(track);
+        // BoggleMusicPlayer musicPlayer = new BoggleMusicPlayer(track);
 
         // ====================================
         // USER INPUT SECTION
@@ -104,6 +112,7 @@ public class BoggleGameScreen extends JFrame {
         wordInput2 = new JTextField("", 8);
         submitButton2 = new JButton("GUESS");
         submitButton2.addActionListener(submitWord);
+        submitButton2.setEnabled(false);
         this.minLength = minLength;
 
         wordLabel.setPreferredSize(new Dimension(200, 20));
@@ -133,29 +142,49 @@ public class BoggleGameScreen extends JFrame {
         // TIMER SECTION
         // ====================================
 
+        turnLabel = new JLabel(playerIndication.getText() + "'s Turn", JLabel.CENTER);
         timerLabel = new JLabel("Time Left to Guess: " + duration, JLabel.CENTER);
         timerLabel.setFont(new Font("Dialog", Font.BOLD, 24));
+        turnLabel.setFont(defaultFont);
+        turnLabel.setPreferredSize(new Dimension(width, 20));
+        turnLabel.setMaximumSize(new Dimension(width, 20));
+        // turnLabel.setBorder(BorderFactory.createLineBorder(Color.black));
+        timerLabel.setPreferredSize(new Dimension(width, 100));
+        timerLabel.setMaximumSize(new Dimension(width, 100));
+        // timerLabel.setBorder(BorderFactory.createLineBorder(Color.black, 0));
         this.duration = duration * 1000; // convert seconds to milliseconds
         startTimer();
 
+        timerPanel.add(turnLabel);
         timerPanel.add(timerLabel);
-
-        // ====================================
-        // WORD RESULT SECTION
-        // ====================================
-
-        wordResult = new JLabel("ex. AND is worth 6 points", JLabel.CENTER);
-        wordResult.setFont(new Font("Dialog", Font.PLAIN, 20));
-        wordResult.setPreferredSize(new Dimension(width, 50));
-        wordResult.setVisible(false);
-
-        wordResultPanel.add(wordResult);
 
         // ====================================
         // BOGGLE BOARD SECTION
         // ====================================
 
         createGrid(grid, board);
+
+        // ====================================
+        // WORD RESULT SECTION
+        // ====================================
+
+        int[] wordLengths = new int[maxDisplayedLength-minLength+1];
+        wordLengthsLabels = new JLabel[maxDisplayedLength-minLength+1];
+        ArrayList<String> possibleWords = BoggleAlgorithms.getAllWords(grid, dictionary, minLength);
+        System.out.println(possibleWords.toString());
+        int totalWords = possibleWords.size();
+        
+        wordResult = new JLabel("Click on the letters to form a word", JLabel.CENTER);
+        totalWordsLabel = new JLabel("0/"+totalWords+" WORDS", JLabel.CENTER);
+        wordResult.setFont(new Font("Dialog", Font.PLAIN, 20));
+        wordResult.setPreferredSize(new Dimension(width, 50));
+        totalWordsLabel.setPreferredSize(new Dimension(width, 50));
+        totalWordsLabel.setFont(defaultFont);
+        // totalWordsLabel.setBorder(BorderFactory.createLineBorder(Color.black));
+        
+        wordResultPanel.add(wordResult);
+        wordResultPanel.add(totalWordsLabel);
+        assignWordLengths(possibleWords, wordLengths);
 
         // ====================================
         // SCORE SECTION
@@ -182,14 +211,27 @@ public class BoggleGameScreen extends JFrame {
         // ====================================
 
         winner = new JLabel("The winner is ", JLabel.CENTER);
+        shakeUpBoard = new JButton("Shake-up the board?");
         restartButton = new JButton("RESTART");
 
         winner.setFont(new Font("Dialog", Font.BOLD, 24));
         winner.setPreferredSize(new Dimension(width, 50));
         winner.setVisible(false);
+        shakeUpBoard.setEnabled(false);
+        
+        shakeUpBoard.addActionListener(new ActionListener() {
+            @Override
+                public void actionPerformed(ActionEvent e) {
+                // TODO - add sfx
+                // reset the board
+                createGrid(grid, board);
+                shakeUpBoard.setEnabled(false);
+            }
+        });
         restartButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                // create warning with sfx
                 // reset all componenets
                 createGrid(grid, board);
                 score = 0;
@@ -201,6 +243,7 @@ public class BoggleGameScreen extends JFrame {
         });
 
         outputPanel.add(winner);
+        outputPanel.add(shakeUpBoard);
         outputPanel.add(restartButton);
 
         // ====================================
@@ -235,15 +278,19 @@ public class BoggleGameScreen extends JFrame {
             // check whether word has already been used
             boolean usedWord = usedWords.size() > 0 ? BoggleAlgorithms.getIdxOfWord(usedWords, wordGuessed) != -1 : false;
 
+            // mark whether the word has been accepted to decide if the turn should be changed
+            boolean wordAccepted = false;
+
             if (wordGuessed.length() >= minLength && !usedWord) {
                 // use getWordPath to check if the word exists in the maze
                 ArrayList<Integer[]> path = BoggleAlgorithms.getWordPath(grid, wordGuessed);
 
                 // use getIdxOfWord to check if the word is in the dictionary
-                boolean isValidWord = BoggleAlgorithms.getIdxOfWord(dictionary, wordGuessed.toLowerCase()) != -1;
-                usedWords.add(wordGuessed); // add the word to the list of used words
+                boolean isValidWord = BoggleAlgorithms.getIdxOfWord(dictionary, wordGuessed) != -1;
 
                 if (!path.isEmpty() && isValidWord) {
+                    wordAccepted = true;
+                    usedWords.add(wordGuessed); // add the word to the list of used words
                     int points = BoggleAlgorithms.getScore(wordGuessed.length());
                     wordResult.setText(wordGuessed + " is worth " + points + " points");
                     if (isPlayerOne) {
@@ -273,15 +320,42 @@ public class BoggleGameScreen extends JFrame {
             wordInput.setText("");
             wordInput2.setText("");
 
-            // TODO - implement timer logic
-            // try {
-            // Thread.sleep(2000);
-            // } catch (InterruptedException ex) {
-            // System.out.println(ex);
-            // }
-            // startTimer();
+            // implement timer logic
+            if (wordAccepted) {
+                try {
+                    Thread.sleep(1000);
+                } 
+                catch (InterruptedException ex) {
+                    System.out.println(ex);
+                }
+                startTimer();
+            }
         }
     };
+
+    private int maxDisplayedLength = 8; // Boggle treats the words of length 8+ the same
+    
+    /**
+     * This method assigns the amount of words on the board at each possible length
+     * from minLength to maxDisplayedLength, inclusive
+     *
+     * @param words A list containing all the possible words
+     * @param wordLengths An array that will contain how many words exist at each possible length
+     */
+    private void assignWordLengths(ArrayList<String> words, int[] wordLengths) {
+        for (String word : words) {
+            int index = word.length() - (maxDisplayedLength-wordLengths.length+1);
+            wordLengths[index]++;
+        }
+        System.out.println(Arrays.toString(wordLengths));
+        for (int i = 0; i < wordLengths.length; i++) {
+            int currLength = maxDisplayedLength-wordLengths.length+i+1;
+            wordLengthsLabels[i] = new JLabel(currLength + ": " + wordLengths[i], JLabel.CENTER);
+            wordLengthsLabels[i].setFont(new Font("Dialog", Font.PLAIN, 16));
+            wordLengthsLabels[i].setPreferredSize(new Dimension(width/wordLengths.length-20, 20));
+            wordResultPanel.add(wordLengthsLabels[i]);
+        }
+    }
 
     private long startTime = -1;
 
@@ -295,12 +369,40 @@ public class BoggleGameScreen extends JFrame {
             if (clockTime >= duration) {
                 clockTime = duration;
                 timer.stop();
+                if (passedTurns == 4) { // Both players have passed twice
+                    passedTurns = 0;
+                    // shake up the board
+                    shakeUpBoard.setEnabled(true);
+                }
+                else {
+                    passedTurns++;
+        
+                }
+                changeTurn();
             }
             long elapsed = now - startTime;
             int secondsLeft = (int) ((duration - elapsed + 500) / 1000);
             timerLabel.setText("Time Left to Guess: " + secondsLeft);
         }
     });
+
+    /**
+     * This method alternates turns between the two players
+     */
+    private void changeTurn() {
+        String currTurn = turnLabel.getText();
+        String currPlayer = currTurn.substring(0, currTurn.length()-7);
+        if (currPlayer.equals(playerIndication.getText())) {
+            turnLabel.setText(playerIndication2.getText() + "'s Turn");
+            submitButton.setEnabled(false);
+            submitButton2.setEnabled(true);
+        }
+        else {
+            turnLabel.setText(playerIndication.getText() + "'s Turn");
+            submitButton.setEnabled(true);
+            submitButton2.setEnabled(false);
+        }
+    }
 
     /**
      * This method starts a timer that indicates the amount of time left a player has to guess
@@ -311,7 +413,13 @@ public class BoggleGameScreen extends JFrame {
             timer.setInitialDelay(0);
             timer.start();
         }
+        else {
+            timer.stop();
+            changeTurn();
+        }
     }
+
+    private ArrayList<int[]> path = new ArrayList<int[]>(); 
 
     /**
      * This method creates a grid of labels by choosing random dice and a random
@@ -342,7 +450,24 @@ public class BoggleGameScreen extends JFrame {
                 board[i][j].addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        board[x][y].setBackground(Color.GREEN);
+                        int[] lastCoords = path.isEmpty() ? new int[]{0, 0} : path.get(path.size()-1);
+                        if (board[x][y].getBackground() == Color.GREEN && x == lastCoords[0] && y == lastCoords[1]) {
+                            board[x][y].setBackground(Color.WHITE);
+                            path.remove(path.size()-1);
+                        }
+                        else if (board[x][y].getBackground() == Color.WHITE) {
+                            if (path.isEmpty() || isAdjacent(x, y, lastCoords[0], lastCoords[1])) {
+                                board[x][y].setBackground(Color.GREEN);
+                                int[] coords = new int[]{x, y};
+                                if (!path.contains(coords)) {
+                                    path.add(coords);
+                                }
+                            }
+                        }
+                        // for (int[] p : path) {
+                        //     System.out.print("[" + p[0] + ", " + p[1] + "], ");
+                        // }
+                        // System.out.println();
                     }
                 });
 
@@ -351,6 +476,24 @@ public class BoggleGameScreen extends JFrame {
             }
         }
         revalidate();
+    }
+
+    /**
+     * This method checks if a cell is one of the 8 adjacent cells 
+     * 
+     * @param x The x coordinate of the current cell
+     * @param y The y coordinate of the current cell
+     * @param prevX The x coordinate of the previous cell
+     * @param prevY The y coordinate of the previous cell
+     * @return A boolean indicating if the coordinates are adjacent
+     */
+    public boolean isAdjacent(int x, int y, int prevX, int prevY) {
+        boolean adjacents = 1 == ((x-prevX)*(x-prevX) + (y-prevY)*(y-prevY));
+        boolean diagonals = Math.abs(x-prevX) == 1 && Math.abs(y-prevY) == 1;
+        if (adjacents || diagonals) {
+            return true;
+        }
+        return false;
     }
 
     /**
