@@ -18,7 +18,7 @@ public class BoggleMusicPlayer {
     // newest value of clipPaused
     volatile boolean clipPaused;
     
-    public BoggleMusicPlayer(String trackName) {
+    public BoggleMusicPlayer(String trackPath, String trackName, boolean doLoop) {
         // Create a new thread for playing the audio file so that this is done in the 
         // background while any other programs continue to run
         new Thread() {
@@ -26,14 +26,16 @@ public class BoggleMusicPlayer {
             public void run() {
                 try {
                     AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(
-                        new File("ICS4UBoggle/audio/" + trackName + MUSIC_EXTENSION).getAbsoluteFile());
+                        new File(trackPath + trackName + MUSIC_EXTENSION).getAbsoluteFile());
                     clipPaused = false;
 
                     Clip clip = AudioSystem.getClip();
                     clip.open(audioInputStream);
-                    clip.loop(Clip.LOOP_CONTINUOUSLY);
+                    if (doLoop) {
+                        clip.loop(Clip.LOOP_CONTINUOUSLY);
+                    }
                     clip.start();
-                    manageClipPlayback(clip);
+                    manageClipPlayback(clip, doLoop);
                 } 
                 catch (UnsupportedAudioFileException e) {e.printStackTrace();} 
                 catch (IOException e) {e.printStackTrace();} 
@@ -47,7 +49,7 @@ public class BoggleMusicPlayer {
      * 
      * @param clip The clip that is to be played
      */
-    public void manageClipPlayback(Clip clip) {
+    public void manageClipPlayback(Clip clip, boolean doLoop) {
         long currPosition = -1;
         while (true) {
             if (clipPaused) {
@@ -58,7 +60,9 @@ public class BoggleMusicPlayer {
             } else {
                 if (currPosition != -1) {
                     clip.setMicrosecondPosition(currPosition);
-                    clip.loop(Clip.LOOP_CONTINUOUSLY);
+                    if (doLoop) {
+                        clip.loop(Clip.LOOP_CONTINUOUSLY);
+                    }
                     clip.start();
                     currPosition = -1;
                 }
