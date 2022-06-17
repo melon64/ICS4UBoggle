@@ -64,6 +64,8 @@ public class BoggleGameScreen extends JFrame {
         setSize(width, height);
         setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
 
+        new BoggleMusicPlayer(track);
+
         inputPanel = new JPanel();
         inputPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 10));
         inputPanel.setPreferredSize(new Dimension(width, 100));
