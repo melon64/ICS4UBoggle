@@ -316,6 +316,7 @@ public class BoggleGameScreen extends JFrame {
 
                 if (!path.isEmpty() && isValidWord) {
                     wordAccepted = true;
+                    passedTurns--;
                     usedWords.add(wordGuessed); // add the word to the list of used words
 
                     // Display the amount of words left 
@@ -427,6 +428,7 @@ public class BoggleGameScreen extends JFrame {
             long clockTime = now - startTime;
             if (clockTime >= currDuration) {
                 timer.stop();
+                new BoggleMusicPlayer("ICS4UBoggle/audio/sound_effects/", "Timer", false);
                 clockTime = currDuration;
                 if (passedTurns == 4) { // Both players have passed twice
                     passedTurns = 0;
@@ -465,6 +467,9 @@ public class BoggleGameScreen extends JFrame {
         }
     }
 
+    /**
+     * This method resets necessary components after a guess has been made
+     */
     private void resetGuess() {
         wordInput.setText("");
         wordInput2.setText("");
