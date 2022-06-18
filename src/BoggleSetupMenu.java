@@ -156,12 +156,12 @@ public class BoggleSetupMenu extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // create the main game screen GUI when this button is clicked
-                setVisible(false);
                 String gameMode = getGameMode();
                 int tournamentScore = getTournamentScore();
                 int duration = getTimerDuration();
                 int minLength = getMinLength();
                 String track = getTrack();
+                dispose();
                 new BoggleGameScreen(gameMode, tournamentScore, duration, minLength, track);
             }
         });

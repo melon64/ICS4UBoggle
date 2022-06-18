@@ -35,8 +35,10 @@ public class BoggleGameScreen extends JFrame {
     JLabel scoreLabel, scoreLabel2;
     JLabel tournamentScoreLabel;
     JLabel winner;
+    JButton pauseButton;
     JButton shakeUpBoard;
     JButton restartButton;
+    JButton exitButton;
 
     private char[][] grid = new char[5][5];
     private JButton[][] board = new JButton[5][5];
@@ -91,7 +93,7 @@ public class BoggleGameScreen extends JFrame {
         scorePanel.setMaximumSize(new Dimension(width, 50));
 
         outputPanel = new JPanel();
-        outputPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 50));
+        outputPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 50));
 
         Font defaultFont = new Font("Dialog", Font.PLAIN, 18);
         Font defaultBoldFont = new Font("Dialog", Font.BOLD, 18);
@@ -222,17 +224,34 @@ public class BoggleGameScreen extends JFrame {
         // ====================================
 
         winner = new JLabel("The winner is ", JLabel.CENTER);
+        pauseButton = new JButton("PAUSE");
         shakeUpBoard = new JButton("Shake-up the board?");
         restartButton = new JButton("RESTART");
+        exitButton = new JButton("EXIT TO MENU");
 
         winner.setFont(new Font("Dialog", Font.BOLD, 24));
         winner.setPreferredSize(new Dimension(width, 50));
         winner.setVisible(false);
         shakeUpBoard.setEnabled(false);
+
+        pauseButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (pauseButton.getText().equals("PAUSE")) {
+                    pauseButton.setText("UNPAUSE");
+                    pausedTime += 1000*(((int)elapsed+500)/1000);
+                    timer.stop();
+                }
+                else {
+                    pauseButton.setText("PAUSE");
+                    resumeTimer(pausedTime);
+                }
+            }
+        });
         
         shakeUpBoard.addActionListener(new ActionListener() {
             @Override
-                public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(ActionEvent e) {
                 new BoggleMusicPlayer("ICS4UBoggle/audio/sound_effects/", "Shake", false);
                 
                 startTimer(); // Reset the timer
@@ -273,9 +292,20 @@ public class BoggleGameScreen extends JFrame {
             }
         });
 
+        exitButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                bgm.pauseClip();
+                dispose();
+                new BoggleSetupMenu();
+            }
+        });
+
         outputPanel.add(winner);
+        outputPanel.add(pauseButton);
         outputPanel.add(shakeUpBoard);
         outputPanel.add(restartButton);
+        outputPanel.add(exitButton);
 
         // ====================================
         // FINALIZATION SECTION
@@ -418,6 +448,8 @@ public class BoggleGameScreen extends JFrame {
     }
 
     private long startTime = -1;
+    private long elapsed = 0;
+    private int pausedTime = 0;
 
     private Timer timer = new Timer(1000, new ActionListener() {
         public void actionPerformed(ActionEvent evt) {
@@ -425,11 +457,12 @@ public class BoggleGameScreen extends JFrame {
                 startTime = System.currentTimeMillis();
             }
             long now = System.currentTimeMillis();
-            long clockTime = now - startTime;
-            if (clockTime >= currDuration) {
+            elapsed = now - startTime;
+            if (elapsed >= currDuration) {
                 timer.stop();
                 new BoggleMusicPlayer("ICS4UBoggle/audio/sound_effects/", "Timer", false);
-                clockTime = currDuration;
+                elapsed = currDuration;
+                pausedTime = 0;
                 if (passedTurns == 4) { // Both players have passed twice
                     passedTurns = 0;
                     // shake up the board
@@ -442,7 +475,6 @@ public class BoggleGameScreen extends JFrame {
                 startTimer();
             } 
             else {
-                long elapsed = now - startTime;
                 int secondsLeft = (int) ((currDuration - elapsed + 500) / 1000);
                 timerLabel.setText("Time Left to Guess: " + secondsLeft);
             }
@@ -493,6 +525,13 @@ public class BoggleGameScreen extends JFrame {
         }
         
         currDuration = duration;
+        startTime = -1;
+        timer.setInitialDelay(0);
+        timer.start();
+    }
+
+    private void resumeTimer(int pausedTime) {
+        currDuration = duration-pausedTime;
         startTime = -1;
         timer.setInitialDelay(0);
         timer.start();
