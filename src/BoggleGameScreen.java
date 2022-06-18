@@ -8,6 +8,8 @@ package ICS4UBoggle.src;
 
 import javax.swing.*;
 import javax.swing.Timer;
+import javax.swing.border.EmptyBorder;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
@@ -21,21 +23,16 @@ public class BoggleGameScreen extends JFrame {
     JPanel wordsPanel;
     JPanel scorePanel;
     JPanel outputPanel;
-    JLabel playerIndication;
-    JLabel playerIndication2;
-    JLabel wordLabel;
-    JLabel wordLabel2;
-    JTextField wordInput;
-    JTextField wordInput2;
-    JButton submitButton;
-    JButton submitButton2;
+    JLabel playerIndication, playerIndication2;
+    JLabel wordLabel, wordLabel2;
+    JLabel wordInput, wordInput2;
+    JButton submitButton, submitButton2;
     JLabel turnLabel;
     JLabel timerLabel;
     JLabel totalWordsLabel;
     JLabel wordResult;
     JLabel[] wordLengthsLabels;
-    JLabel scoreLabel;
-    JLabel scoreLabel2;
+    JLabel scoreLabel, scoreLabel2;
     JLabel tournamentScoreLabel;
     JLabel winner;
     JButton shakeUpBoard;
@@ -45,18 +42,19 @@ public class BoggleGameScreen extends JFrame {
     private JButton[][] board = new JButton[5][5];
 
     private int width = 1080, height = 960;
-    private int score = 0;
-    private int score2 = 0;
+    private int score = 0, score2 = 0;
     private int passedTurns = 0;
     private int totalWords;
     private int duration;
     private int currDuration;
     private int minLength;
+    private int tournamentScore;
     private int[] wordLengths;
     
     private final ArrayList<String> usedWords = new ArrayList<String>();
     private final ArrayList<String> dictionary = getDictionaryFromFile();
     private final ArrayList<char[]> dice = readDiceDistribution();
+    private BoggleMusicPlayer bgm;
 
     public BoggleGameScreen(String gameMode, int tournamentScore, int duration, int minLength, String track) {
         // ====================================
@@ -67,7 +65,7 @@ public class BoggleGameScreen extends JFrame {
         setSize(width, height);
         setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
 
-        new BoggleMusicPlayer("ICS4UBoggle/audio/", track, true);
+        bgm = new BoggleMusicPlayer("ICS4UBoggle/audio/", track, true);
 
         inputPanel = new JPanel();
         inputPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 10));
@@ -96,41 +94,50 @@ public class BoggleGameScreen extends JFrame {
         outputPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 50));
 
         Font defaultFont = new Font("Dialog", Font.PLAIN, 18);
-
-        // ====================================
-        // MUSIC SECTION
-        // ====================================
-
-        // BoggleMusicPlayer musicPlayer = new BoggleMusicPlayer(track);
-
+        Font defaultBoldFont = new Font("Dialog", Font.BOLD, 18);
+        
         // ====================================
         // USER INPUT SECTION
         // ====================================
-
+        
         playerIndication = new JLabel("Player 1", JLabel.CENTER);
-        wordLabel = new JLabel("Enter Word: ", JLabel.RIGHT);
-        wordInput = new JTextField("", 8);
+        wordLabel = new JLabel("Current Word: ", JLabel.RIGHT);
+        wordInput = new JLabel("", JLabel.LEFT);
         submitButton = new JButton("GUESS");
-        submitButton.addActionListener(submitWord);
         playerIndication2 = new JLabel("Player 2", JLabel.CENTER);
-        wordLabel2 = new JLabel("Enter Word: ", JLabel.RIGHT);
-        wordInput2 = new JTextField("", 8);
+        wordLabel2 = new JLabel("Current Word: ", JLabel.RIGHT);
+        wordInput2 = new JLabel("", JLabel.LEFT);
         submitButton2 = new JButton("GUESS");
+        
+        this.minLength = minLength;
+        submitButton.addActionListener(submitWord);
         submitButton2.addActionListener(submitWord);
         submitButton2.setEnabled(false);
-        this.minLength = minLength;
 
         wordLabel.setPreferredSize(new Dimension(200, 20));
+        wordLabel2.setPreferredSize(new Dimension(330, 20));
+        wordInput.setPreferredSize(new Dimension(100, 25));
+        wordInput2.setPreferredSize(new Dimension(100, 25));
         playerIndication.setPreferredSize(new Dimension(520, 50));
-        wordLabel2.setPreferredSize(new Dimension(350, 20));
         playerIndication2.setPreferredSize(new Dimension(520, 50));
+        wordInput.setBackground(Color.WHITE);
+        wordInput2.setBackground(Color.WHITE);
+        wordInput.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        wordInput2.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        wordInput.setOpaque(true);
+        wordInput2.setOpaque(true);
+        playerIndication.setFont(defaultBoldFont);
+        playerIndication2.setFont(defaultBoldFont);
+        playerIndication.setForeground(Color.BLUE);
+        playerIndication2.setForeground(Color.RED);
+        wordInput.setFont(defaultBoldFont);
+        wordInput2.setFont(defaultBoldFont);
 
         // changes depending on mode
         if (gameMode.equals("Single Player")) {
             playerIndication2.setText("Computer Player");
             wordLabel2.setText("Computer's Word: ");
-            wordInput2.setColumns(10);
-            wordInput2.setEnabled(false);
+            wordInput2.setPreferredSize(new Dimension(150, 25));
             submitButton2.setVisible(false);
         }
 
@@ -153,10 +160,8 @@ public class BoggleGameScreen extends JFrame {
         turnLabel.setFont(defaultFont);
         turnLabel.setPreferredSize(new Dimension(width, 20));
         turnLabel.setMaximumSize(new Dimension(width, 20));
-        // turnLabel.setBorder(BorderFactory.createLineBorder(Color.black));
         timerLabel.setPreferredSize(new Dimension(width, 100));
         timerLabel.setMaximumSize(new Dimension(width, 100));
-        // timerLabel.setBorder(BorderFactory.createLineBorder(Color.black, 0));
         this.duration = duration * 1000; // convert seconds to milliseconds
         currDuration = duration * 1000;
         startTimer();
@@ -186,7 +191,6 @@ public class BoggleGameScreen extends JFrame {
         wordResult.setPreferredSize(new Dimension(width, 50));
         totalWordsLabel.setPreferredSize(new Dimension(width, 50));
         totalWordsLabel.setFont(defaultFont);
-        // totalWordsLabel.setBorder(BorderFactory.createLineBorder(Color.black));
         
         wordResultPanel.add(wordResult);
         wordResultPanel.add(totalWordsLabel);
@@ -201,9 +205,10 @@ public class BoggleGameScreen extends JFrame {
         scoreLabel2 = new JLabel(playerScore + score2, JLabel.CENTER);
         tournamentScoreLabel = new JLabel("Score to Reach: " + tournamentScore, JLabel.CENTER);
 
+        this.tournamentScore = tournamentScore;
         scoreLabel.setFont(defaultFont);
         scoreLabel2.setFont(defaultFont);
-        tournamentScoreLabel.setFont(new Font("Dialog", Font.BOLD, 18));
+        tournamentScoreLabel.setFont(defaultBoldFont);
         scoreLabel.setPreferredSize(new Dimension(420, 50));
         scoreLabel2.setPreferredSize(new Dimension(400, 50));
         tournamentScoreLabel.setPreferredSize(new Dimension(200, 50));
@@ -228,32 +233,43 @@ public class BoggleGameScreen extends JFrame {
         shakeUpBoard.addActionListener(new ActionListener() {
             @Override
                 public void actionPerformed(ActionEvent e) {
-                // TODO - add sfx
-                // Reset the timer
-                startTimer();
-
-                // Reset the board
-                createGrid(grid, board);
+                new BoggleMusicPlayer("ICS4UBoggle/audio/sound_effects/", "Shake", false);
                 
+                startTimer(); // Reset the timer
+                createGrid(grid, board); // Reset the board
                 shakeUpBoard.setEnabled(false);
             }
         });
         restartButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // TODO - create warning with sfx
+                new BoggleMusicPlayer("ICS4UBoggle/audio/sound_effects/", "Restart", false);
+                
                 // Reset all componenets
-                createGrid(grid, board);
-                ArrayList<String> possibleWords = BoggleAlgorithms.getAllWords(grid, dictionary, minLength);
-                totalWords = possibleWords.size();
-                totalWordsLabel.setText("0/"+totalWords+" WORDS");
-                assignWordLengths(possibleWords);
+                createGrid(grid, board); // Create a new grid and board
+                ArrayList<String> possibleWords = BoggleAlgorithms.getAllWords(grid, dictionary, minLength); // Get the new list of possible words
+                totalWords = possibleWords.size(); // Update the new total words
+                usedWords.clear(); // Clear all the past used words
+                assignWordLengths(possibleWords); // Update the new number of words at each length
 
+                // Reset the scores
                 score = 0;
                 score2 = 0;
+
+                // Update labels
+                totalWordsLabel.setText("0/"+totalWords+" WORDS");
                 scoreLabel.setText("Player 1 Score: " + score);
                 scoreLabel2.setText(playerScore + score2);
                 wordResult.setText("Click on the letters to form a word");
+                winner.setText("The winner is ");
+                winner.setVisible(false);
+
+                // Change the turn to the first player
+                if (!getCurrentPlayer().equals(playerIndication2.getText())) {
+                    changeTurn();
+                }
+                bgm.unpauseClip();
+                startTimer();
             }
         });
 
@@ -284,17 +300,12 @@ public class BoggleGameScreen extends JFrame {
         public void actionPerformed(ActionEvent e) {
             wordResult.setVisible(true);
 
-            // check which player has guessed
-            boolean isPlayerOne = e.getSource() == submitButton;
+            boolean isPlayerOne = e.getSource() == submitButton; // check which player has guessed
+            String wordGuessed = isPlayerOne ? wordInput.getText().toUpperCase() : wordInput2.getText().toUpperCase(); // get the word inputed through the text field
+            boolean usedWord = usedWords.size() > 0 ? BoggleAlgorithms.getIdxOfWord(usedWords, wordGuessed) != -1 : false; // check whether word has already been used
 
-            // get the word inputed through the text field
-            String wordGuessed = isPlayerOne ? wordInput.getText().toUpperCase() : wordInput2.getText().toUpperCase();
-            
-            // check whether word has already been used
-            boolean usedWord = usedWords.size() > 0 ? BoggleAlgorithms.getIdxOfWord(usedWords, wordGuessed) != -1 : false;
-
-            // mark whether the word has been accepted to decide if the turn should be changed
-            boolean wordAccepted = false;
+            boolean wordAccepted = false; // mark whether the word has been accepted to decide if the turn should be changed
+            boolean winnerDecided = false; // mark whether a player has reached the tournament score
 
             if (wordGuessed.length() >= minLength && !usedWord) {
                 // use getWordPath to check if the word exists in the maze
@@ -322,6 +333,24 @@ public class BoggleGameScreen extends JFrame {
                         score2 += points;
                         scoreLabel2.setText("Player 2 Score: " + score2);
                     }
+
+                    // Check if a player has reached the winning condition
+                    if (score >= tournamentScore) {
+                        winner.setText(winner.getText() + playerIndication.getText() + "!");
+                        winnerDecided = true;
+                    }
+                    else if (score2 >= tournamentScore) {
+                        winner.setText(winner.getText() + playerIndication2.getText() + "!");
+                        winnerDecided = true;
+                    }
+                    if (winnerDecided) {
+                        winner.setVisible(true);
+                        bgm.pauseClip();
+                        new BoggleMusicPlayer("ICS4UBoggle/audio/sound_effects/", "Winner", false);
+                        timer.stop();
+                        submitButton.setEnabled(false);
+                        submitButton2.setEnabled(false);
+                    }
                 }
                 else if (isValidWord) {
                     wordResult.setText(wordGuessed + " is not on the board");
@@ -338,15 +367,18 @@ public class BoggleGameScreen extends JFrame {
                     wordResult.setText(wordGuessed + " is less than the minimum length of " + minLength);
                 }
             }
-
+            // Clean up the board
             resetGuess();
 
-            // Implement timer logic
-            if (wordAccepted) {
-                new BoggleMusicPlayer("ICS4UBoggle/audio/sound_effects/", "Correct", false);
-                startTimer();
-            } else {
-                new BoggleMusicPlayer("ICS4UBoggle/audio/sound_effects/", "Incorrect", false);
+            // If the winner has been decided, stop gameplay
+            if (!winnerDecided) {
+                // Else, implement timer logic
+                if (wordAccepted) {
+                    new BoggleMusicPlayer("ICS4UBoggle/audio/sound_effects/", "Correct", false);
+                    startTimer();
+                } else {
+                    new BoggleMusicPlayer("ICS4UBoggle/audio/sound_effects/", "Incorrect", false);
+                }
             }
         }
     };
@@ -394,8 +426,8 @@ public class BoggleGameScreen extends JFrame {
             long now = System.currentTimeMillis();
             long clockTime = now - startTime;
             if (clockTime >= currDuration) {
-                clockTime = currDuration;
                 timer.stop();
+                clockTime = currDuration;
                 if (passedTurns == 4) { // Both players have passed twice
                     passedTurns = 0;
                     // shake up the board
@@ -406,10 +438,12 @@ public class BoggleGameScreen extends JFrame {
                 }
                 changeTurn();
                 startTimer();
+            } 
+            else {
+                long elapsed = now - startTime;
+                int secondsLeft = (int) ((currDuration - elapsed + 500) / 1000);
+                timerLabel.setText("Time Left to Guess: " + secondsLeft);
             }
-            long elapsed = now - startTime;
-            int secondsLeft = (int) ((currDuration - elapsed + 500) / 1000);
-            timerLabel.setText("Time Left to Guess: " + secondsLeft);
         }
     });
 
@@ -448,14 +482,13 @@ public class BoggleGameScreen extends JFrame {
      */
     private void startTimer() {
         // Reset the timer
-        currDuration = duration;
-        startTime = -1;
-
         if (timer.isRunning()) {
             timer.stop();
             changeTurn();
         }
         
+        currDuration = duration;
+        startTime = -1;
         timer.setInitialDelay(0);
         timer.start();
     }
