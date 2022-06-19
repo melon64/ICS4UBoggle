@@ -1,4 +1,4 @@
-package ICS4UBoggle.src.computer_player;
+package ai;
 
 public class Cell extends Position {
     private boolean isChecked;
@@ -9,11 +9,11 @@ public class Cell extends Position {
         this.letter = letter;
     }
 
-    public void checked() {
+    public void visited() {
         isChecked = true;
     }
 
-    public boolean isChecked() {
+    public boolean isVisited() {
         return isChecked;
     }
 

@@ -1,5 +1,4 @@
-package ICS4UBoggle.src.computer_player;
-
+package ai;
 public class Position {
     int x;
     int y;
