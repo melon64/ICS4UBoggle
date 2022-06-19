@@ -1,22 +1,20 @@
-package ai;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Stack;
-import java.util.stream.Collectors;
+package ICS4UBoggle.src.ai;
+
+import java.util.*;
+
+import ICS4UBoggle.src.BoggleAlgorithms;
 
 public class ComputerPlayer {
     Cell[][] cells;
 
     int rows; // y
     int cols; // x
+    int minLength = 3;
 
     Stack<Cell> letterStack = new Stack<>();
-    HashSet<String> wordsFound = new HashSet<>();
-
     Dictionary dictionary = new Dictionary();
+    HashSet<String> wordsFound;
 
-    int totalPoints;
     Position[] deltaPositions = {
             new Position(0, -1), // N
             new Position(1, -1), // NE
@@ -31,7 +29,7 @@ public class ComputerPlayer {
     /**
      * @param boggleGrid The gameboard
      */
-    public ComputerPlayer(char[][] boggleGrid) {
+    public ComputerPlayer(char[][] boggleGrid, ArrayList<String> usedWords, int minLength) {
         rows = boggleGrid.length;
         cols = boggleGrid[0].length;
 
@@ -39,9 +37,12 @@ public class ComputerPlayer {
 
         for (int y = 0; y < rows; y++) {
             for (int x = 0; x < cols; x++) {
-                cells[y][x] = new Cell(boggleGrid[y][x], x, y);
+                cells[y][x] = new Cell(Character.toLowerCase(boggleGrid[y][x]), x, y);
             }
         }
+
+        this.minLength = minLength; 
+        wordsFound = new HashSet<>(usedWords);
     }
 
     public ArrayList<int[]> start() {
@@ -61,26 +62,24 @@ public class ComputerPlayer {
      * @return
      */
     public Collection<Cell> run() {
-        totalPoints = 0;
         Cell startCell = getRandomCell();
         if (startCell == null) { // if all start cells have been used, return -1
             return null;
         } else {
-            doesCellMakeWord(cells[0][0]);
+            doesCellMakeWord(startCell);
             return letterStack;
         }
     }
 
-    ////////////////////////////////////////////////////////////////////////////////////////// DFS
+    // DFS
     public boolean doesCellMakeWord(Cell cell) {
         letterStack.push(cell);
-
+        
         String word = stackWord();
-        if (dictionary.doesContainWord(word) && !wordsFound.contains(word)) {
+        if (BoggleAlgorithms.getIdxOfWord(dictionary.dictionary, word) != -1 && !wordsFound.contains(word) && word.length() > minLength) {
             wordsFound.add(word);
             return true;
         }
-
         return doesAdjacentCellsMakeWord(cell);
     }
 
@@ -107,7 +106,6 @@ public class ComputerPlayer {
         }
         return cells[pos.y][pos.x];
     }
-    ////////////////////////////////////////////////////////////////////////////////////////// DFS
 
     public Cell getRandomCell() {
         if (isAllVisited()) { // if every cell has been tried, return null
@@ -117,7 +115,7 @@ public class ComputerPlayer {
         int randX;
         int randY;
 
-        int max = 4;
+        int max = cells.length-1;
         int min = 0;
         int range = max - min + 1;
 

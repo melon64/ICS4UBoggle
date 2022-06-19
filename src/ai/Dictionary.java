@@ -1,18 +1,28 @@
-package ai;
+package ICS4UBoggle.src.ai;
 
-import java.util.TreeSet;
+import java.util.*;
+import java.io.*;
 
 public class Dictionary {
-    TreeSet<String> dictionary = new TreeSet<>();
+    ArrayList<String> dictionary = new ArrayList<>();
 
     public Dictionary() {
-        dictionary.add("apple");
-        dictionary.add("123450");
-        dictionary.add("127bcdie0543");
-        dictionary.add("17cio");
+        readDictionaryFromFile();
     }
 
-    public boolean doesContainWord(String word) {
-        return dictionary.contains(word);
+    private void readDictionaryFromFile() {
+        try {
+            File file = new File("ICS4UBoggle/files/dictionary.txt");
+            Scanner in = new Scanner(file);
+
+            while (in.hasNextLine()) {
+                String nextLine = in.nextLine();
+                nextLine = nextLine.trim();
+                dictionary.add(nextLine);
+            }
+            in.close();
+        } catch (FileNotFoundException exception) {
+            System.out.println(exception);
+        }
     }
 }

@@ -1,4 +1,4 @@
-package ai;
+package ICS4UBoggle.src.ai;
 public class Position {
     int x;
     int y;

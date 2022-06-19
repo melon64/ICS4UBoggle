@@ -1,3 +1,5 @@
+package ICS4UBoggle.src;
+
 /**
  * Names: Adarsh P, Larris X, Felix X, and Hubert X
  * Date: June 8, 2022
@@ -6,7 +8,6 @@
 
 public class BoggleGame {
     public static void main(String[] args) {
-        BoggleSetupMenu menuGUI = new BoggleSetupMenu();
-        // BoggleGameScreen boggle = new BoggleGameScreen();
+        new BoggleSetupMenu();
     }
 }

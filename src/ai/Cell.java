@@ -1,4 +1,4 @@
-package ai;
+package ICS4UBoggle.src.ai;
 
 public class Cell extends Position {
     private boolean isChecked;

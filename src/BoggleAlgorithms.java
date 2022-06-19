@@ -1,3 +1,5 @@
+package ICS4UBoggle.src;
+
 import java.io.*;
 import java.util.*;
 
