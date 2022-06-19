@@ -55,7 +55,7 @@ public class BoggleGameScreen extends JFrame {
     private int tournamentScore;
     private int[] wordLengths;
 
-    private final ArrayList<String> usedWords = new ArrayList<String>();
+    public final ArrayList<String> usedWords = new ArrayList<String>();
     private final ArrayList<String> dictionary = getDictionaryFromFile();
     private final ArrayList<char[]> dice = readDiceDistribution();
     private BoggleMusicPlayer bgm;
@@ -259,6 +259,7 @@ public class BoggleGameScreen extends JFrame {
 
                 startTimer(); // Reset the timer
                 createGrid(grid, board); // Reset the board
+                cpu = new ComputerPlayer(grid, usedWords, minLength); // Reset the CPU
                 shakeUpBoard.setEnabled(false);
             }
         });
@@ -269,6 +270,7 @@ public class BoggleGameScreen extends JFrame {
 
                 // Reset all componenets
                 createGrid(grid, board); // Create a new grid and board
+                cpu = new ComputerPlayer(grid, usedWords, minLength); // Create a new CPU
                 ArrayList<String> possibleWords = BoggleAlgorithms.getAllWords(grid, dictionary, minLength); // Get the new list of possible words
                 totalWords = possibleWords.size(); // Update the new total words
                 usedWords.clear(); // Clear all the past used words
@@ -334,85 +336,88 @@ public class BoggleGameScreen extends JFrame {
             wordResult.setVisible(true);
 
             boolean isPlayerOne = e.getSource() == submitButton; // check which player has guessed
-            String wordGuessed = isPlayerOne ? wordInput.getText().toUpperCase() : wordInput2.getText().toUpperCase(); // get the word from the text field
-
-            boolean usedWord = usedWords.size() > 0 ? BoggleAlgorithms.getIdxOfWord(usedWords, wordGuessed) != -1
-                    : false; // check whether word has already been used
-
-            boolean wordAccepted = false; // mark whether the word has been accepted to decide if the turn should be changed
-            boolean winnerDecided = false; // mark whether a player has reached the tournament score
-
-            if (wordGuessed.length() >= minLength && !usedWord) {
-                // use getWordPath to check if the word exists in the maze
-                ArrayList<Integer[]> path = BoggleAlgorithms.getWordPath(grid, wordGuessed);
-
-                // use getIdxOfWord to check if the word is in the dictionary
-                boolean isValidWord = BoggleAlgorithms.getIdxOfWord(dictionary, wordGuessed) != -1;
-
-                if (!path.isEmpty() && isValidWord) {
-                    wordAccepted = true;
-                    passedTurns--;
-                    usedWords.add(wordGuessed); // add the word to the list of used words
-
-                    // Display the amount of words left
-                    int index = wordGuessed.length() - (maxDisplayedLength - wordLengths.length + 1);
-                    totalWordsLabel.setText(usedWords.size() + "/" + totalWords + " WORDS");
-                    wordLengths[index]--;
-                    wordLengthsLabels[index].setText(wordGuessed.length() + ": " + wordLengths[index]);
-
-                    int points = BoggleAlgorithms.getScore(wordGuessed.length());
-                    wordResult.setText(wordGuessed + " is worth " + points + " points");
-                    if (isPlayerOne) {
-                        score += points;
-                        scoreLabel.setText("Player 1 Score: " + score);
-                    } else {
-                        score2 += points;
-                        scoreLabel2.setText("Player 2 Score: " + score2);
-                    }
-
-                    // Check if a player has reached the winning condition
-                    if (score >= tournamentScore) {
-                        winner.setText(winner.getText() + playerIndication.getText() + "!");
-                        winnerDecided = true;
-                    } else if (score2 >= tournamentScore) {
-                        winner.setText(winner.getText() + playerIndication2.getText() + "!");
-                        winnerDecided = true;
-                    }
-                    if (winnerDecided) {
-                        winner.setVisible(true);
-                        bgm.pauseClip();
-                        new BoggleMusicPlayer("ICS4UBoggle/audio/sound_effects/", "Winner", false);
-                        timer.stop();
-                        submitButton.setEnabled(false);
-                        submitButton2.setEnabled(false);
-                    }
-                } else if (isValidWord) {
-                    wordResult.setText(wordGuessed + " is not on the board");
-                } else {
-                    wordResult.setText(wordGuessed + " is not a valid word");
-                }
-            } else {
-                if (usedWord) {
-                    wordResult.setText(wordGuessed + " has already been used");
-                } else {
-                    wordResult.setText(wordGuessed + " is less than the minimum length of " + minLength);
-                }
-            }
-            // Clean up the board
-            resetGuess();
-
-            // If the winner has been decided, stop gameplay
-            if (!winnerDecided) {
-                // Else, implement timer logic
-                if (wordAccepted) {
-                    new BoggleMusicPlayer("ICS4UBoggle/audio/sound_effects/", "Correct", false);
-                    startTimer();
-                } else {
-                    new BoggleMusicPlayer("ICS4UBoggle/audio/sound_effects/", "Incorrect", false);
-                }
-            }
+            processWord(isPlayerOne);
         }
     };
+
+    private void processWord (boolean isPlayerOne) {
+        String wordGuessed = isPlayerOne ? wordInput.getText().toUpperCase() : wordInput2.getText().toUpperCase(); // get the word from the text field
+
+        boolean usedWord = usedWords.size() > 0 ? usedWords.contains(wordGuessed) : false; // check whether word has already been used
+
+        boolean wordAccepted = false; // mark whether the word has been accepted to decide if the turn should be changed
+        boolean winnerDecided = false; // mark whether a player has reached the tournament score
+
+        if (wordGuessed.length() >= minLength && !usedWord) {
+            // use getWordPath to check if the word exists in the maze
+            ArrayList<Integer[]> path = BoggleAlgorithms.getWordPath(grid, wordGuessed);
+
+            // use getIdxOfWord to check if the word is in the dictionary
+            boolean isValidWord = BoggleAlgorithms.getIdxOfWord(dictionary, wordGuessed) != -1;
+
+            if (!path.isEmpty() && isValidWord) {
+                wordAccepted = true;
+                passedTurns--;
+                usedWords.add(wordGuessed); // add the word to the list of used words
+
+                // Display the amount of words left
+                int index = wordGuessed.length() - (maxDisplayedLength - wordLengths.length + 1);
+                totalWordsLabel.setText(usedWords.size() + "/" + totalWords + " WORDS");
+                wordLengths[index]--;
+                wordLengthsLabels[index].setText(wordGuessed.length() + ": " + wordLengths[index]);
+
+                int points = BoggleAlgorithms.getScore(wordGuessed.length());
+                wordResult.setText(wordGuessed + " is worth " + points + " points");
+                if (isPlayerOne) {
+                    score += points;
+                    scoreLabel.setText("Player 1 Score: " + score);
+                } else {
+                    score2 += points;
+                    scoreLabel2.setText("Player 2 Score: " + score2);
+                }
+
+                // Check if a player has reached the winning condition
+                if (score >= tournamentScore) {
+                    winner.setText(winner.getText() + playerIndication.getText() + "!");
+                    winnerDecided = true;
+                } else if (score2 >= tournamentScore) {
+                    winner.setText(winner.getText() + playerIndication2.getText() + "!");
+                    winnerDecided = true;
+                }
+                if (winnerDecided) {
+                    winner.setVisible(true);
+                    bgm.pauseClip();
+                    new BoggleMusicPlayer("ICS4UBoggle/audio/sound_effects/", "Winner", false);
+                    timer.stop();
+                    submitButton.setEnabled(false);
+                    submitButton2.setEnabled(false);
+                }
+            } else if (isValidWord) {
+                wordResult.setText(wordGuessed + " is not on the board");
+            } else {
+                wordResult.setText(wordGuessed + " is not a valid word");
+            }
+        } else {
+            if (usedWord) {
+                wordResult.setText(wordGuessed + " has already been used");
+            } else {
+                wordResult.setText(wordGuessed + " is less than the minimum length of " + minLength);
+            }
+        }
+        // Clean up the board
+        resetGuess();
+
+        // If the winner has been decided, stop gameplay
+        if (!winnerDecided) {
+            // Else, implement timer logic
+            if (wordAccepted) {
+                new BoggleMusicPlayer("ICS4UBoggle/audio/sound_effects/", "Correct", false);
+                startTimer();
+            } else {
+                new BoggleMusicPlayer("ICS4UBoggle/audio/sound_effects/", "Incorrect", false);
+            }
+        }
+    }
 
     private int maxDisplayedLength = 8; // Boggle treats the words of length 8+ the same
 
@@ -492,32 +497,37 @@ public class BoggleGameScreen extends JFrame {
             if (playerIndication2.getText().equals("Computer Player")) {
                 // Run computer player guess logic
                 try {
-                    Collection<Cell> wordCellFound = cpu.run();
-                    Collection<Character> wordPath = wordCellFound.stream().map(cell->cell.getLetter()).collect(Collectors.toList());
-                    final String word = wordPath.stream().map(String::valueOf).collect(Collectors.joining()).toUpperCase();
-                    System.out.println(word);
-                    ArrayList<Integer[]> path = BoggleAlgorithms.getWordPath(grid, word);
+                    ArrayList<int[]> path = cpu.start(); // Get the path of the random word
+                    
+                    // Create the word formed by the path
+                    String word = "";
+                    for (int[] coord : path) {
+                        word = word + grid[coord[1]][coord[0]];
+                    }
+                    final String guessedWord = word;
 
-                    if (word.length() > 0) {
+                    if (word != null && !word.isEmpty()) {
+                        // Display the CPU's word at a 500ms interval
                         Timer displayCPU = new Timer(500, new ActionListener() {
                             public void actionPerformed(ActionEvent evt) {
-                                board[path.get(0)[0]][path.get(0)[1]].setBackground(Color.GREEN);
-                                wordInput2.setText(wordInput2.getText() + grid[path.get(0)[0]][path.get(0)[1]]);
-                                path.remove(0);
-                                if (wordInput2.getText().equals(word)) {
+                                if (wordInput2.getText().equals(guessedWord)) {
                                     ((Timer) evt.getSource()).stop();
+                                    processWord(false);
+                                }
+                                else {
+                                    board[path.get(0)[1]][path.get(0)[0]].setBackground(Color.GREEN);
+                                    wordInput2.setText(wordInput2.getText() + grid[path.get(0)[1]][path.get(0)[0]]);
+                                    path.remove(0);
                                 }
                             }
                         });
-                        displayCPU.setInitialDelay(1000);
+                        int delay = (int) (Math.random() * ((duration-500)/word.length())/500)*500+1000;
+                        displayCPU.setInitialDelay(delay);
                         displayCPU.start();
-                    }
-                    else {
-                        System.out.println("no word found");
                     }
                 } 
                 catch (Exception ex) {
-                    System.out.println(ex);
+                    wordInput2.setText("I am stumped");
                 }
             }
         }

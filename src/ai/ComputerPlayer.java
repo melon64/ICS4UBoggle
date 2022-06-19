@@ -49,9 +49,11 @@ public class ComputerPlayer {
         run();
         
         ArrayList<int[]> list = new ArrayList<>();
-
+        String word = "";
+        
         for (Cell cell : letterStack) {
             list.add(new int[]{cell.x, cell.y});
+            word = word += cell.getLetter();
         }
 
         return list;
@@ -63,6 +65,7 @@ public class ComputerPlayer {
      */
     public Collection<Cell> run() {
         Cell startCell = getRandomCell();
+        letterStack.clear();
         if (startCell == null) { // if all start cells have been used, return -1
             return null;
         } else {
@@ -124,6 +127,7 @@ public class ComputerPlayer {
             randY = (int) (Math.random() * range) + min;
         } while (cells[randY][randX].isVisited());
 
+        cells[randY][randX].setVisited();
         return cells[randY][randX];
     }
 

@@ -9,7 +9,7 @@ public class Cell extends Position {
         this.letter = letter;
     }
 
-    public void visited() {
+    public void setVisited() {
         isChecked = true;
     }
 
