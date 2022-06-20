@@ -116,7 +116,7 @@ public class BoggleGameScreen extends JFrame {
         boardPanel.setPreferredSize(new Dimension(width, 300));
         boardPanel.setBackground(LIGHT_BLUE);
         // Add 20 pixels of padding to the left and to the right of boardPanel
-        boardPanel.setBorder(new EmptyBorder(0, 20, 0, 20));
+        boardPanel.setBorder(new EmptyBorder(0, 150, 0, 150));
 
         scorePanel = new JPanel();
         scorePanel.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 10));
