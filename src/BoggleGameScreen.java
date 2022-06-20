@@ -51,6 +51,7 @@ public class BoggleGameScreen extends JFrame {
     private int minLength;
     private int tournamentScore;
     private int[] wordLengths;
+    private boolean isPaused = false;
     private boolean hasRestarted = false;
 
     public final ArrayList<String> usedWords = new ArrayList<String>();
@@ -244,11 +245,13 @@ public class BoggleGameScreen extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 if (pauseButton.getText().equals("PAUSE")) {
                     pauseButton.setText("UNPAUSE");
+                    isPaused = true;
                     // Store the current elapsed time
                     pausedTime += 1000 * (((int) elapsed + 500) / 1000);
                     timer.stop();
                 } else {
                     pauseButton.setText("PAUSE");
+                    isPaused = false;
                     // Resume the timer at the paused time
                     resumeTimer(pausedTime);
                 }
@@ -648,7 +651,7 @@ public class BoggleGameScreen extends JFrame {
                     public void actionPerformed(ActionEvent e) {
                         int[] lastCoords = path.isEmpty() ? new int[] { 0, 0 } : path.get(path.size() - 1);
                         // If current cell is being used in the path and is the last inputed letter
-                        if (!getCurrentPlayer().equals("Computer Player")) {
+                        if (!getCurrentPlayer().equals("Computer Player") && !isPaused) {
                             if (board[x][y].getBackground() == Color.GREEN && x == lastCoords[0]
                                     && y == lastCoords[1]) {
                                 // Undo selection

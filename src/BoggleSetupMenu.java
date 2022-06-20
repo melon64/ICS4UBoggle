@@ -114,7 +114,7 @@ public class BoggleSetupMenu extends JFrame {
         constraints.anchor = GridBagConstraints.EAST;
         settingsPanel.add(scoreLabel, constraints);
 
-        scoreSpinner = new JSpinner(new SpinnerNumberModel(20, 1, null, 1));
+        scoreSpinner = new JSpinner(new SpinnerNumberModel(5, 1, null, 1));
         JFormattedTextField scoreTextField = ((JSpinner.DefaultEditor)scoreSpinner.getEditor()).getTextField();
         // Set the number of columns of scoreSpinner to 3 - this will allow you to fit 4-digit numbers
         scoreTextField.setColumns(3);
