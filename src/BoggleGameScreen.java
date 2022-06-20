@@ -59,9 +59,14 @@ public class BoggleGameScreen extends JFrame {
     private final ArrayList<char[]> dice = readDiceDistribution();
 
     private BoggleMusicPlayer bgm;
+    
     private ComputerPlayer cpu;
+    private ComputerPlayer2 cpu2;
+    private String computerMode;
 
-    public BoggleGameScreen(String gameMode, int tournamentScore, int duration, int minLength, String track) {
+    ArrayList<String> possibleWords;
+
+    public BoggleGameScreen(String gameMode, int tournamentScore, int duration, int minLength, String track, String computerMode, int computerDifficulty) {
         // ====================================
         // INITIAL SECTION
         // ====================================
@@ -179,8 +184,17 @@ public class BoggleGameScreen extends JFrame {
         // BOGGLE BOARD SECTION
         // ====================================
 
+        // Store all the possible words on the board
         createGrid(grid, board);
-        cpu = new ComputerPlayer(grid, usedWords, minLength);
+        possibleWords = BoggleAlgorithms.getAllWords(grid, dictionary, minLength);
+        totalWords = possibleWords.size();
+        
+        this.computerMode = computerMode;
+        if (computerMode.equals("Basic")) {
+            cpu = new ComputerPlayer(grid, usedWords, minLength);
+        } else {
+            cpu2 = new ComputerPlayer2(possibleWords, computerDifficulty, usedWords, grid);
+        }
 
         // ====================================
         // WORD RESULT SECTION
@@ -188,10 +202,6 @@ public class BoggleGameScreen extends JFrame {
 
         wordLengths = new int[maxDisplayedLength - minLength + 1];
         wordLengthsLabels = new JLabel[maxDisplayedLength - minLength + 1];
-
-        // Store all the possible words on the board
-        ArrayList<String> possibleWords = BoggleAlgorithms.getAllWords(grid, dictionary, minLength);
-        totalWords = possibleWords.size();
 
         wordResult = new JLabel("Click on the letters to form a word", JLabel.CENTER);
         totalWordsLabel = new JLabel("0/" + totalWords + " WORDS", JLabel.CENTER);
@@ -265,7 +275,12 @@ public class BoggleGameScreen extends JFrame {
 
                 startTimer(); // Reset the timer
                 createGrid(grid, board); // Reset the board
-                cpu = new ComputerPlayer(grid, usedWords, minLength); // Reset the CPU
+                possibleWords = BoggleAlgorithms.getAllWords(grid, dictionary, minLength); // Get the new list of possible words
+                if (computerMode.equals("Basic")) {
+                    cpu = new ComputerPlayer(grid, usedWords, minLength); // Reset the CPU
+                } else {
+                    cpu2 = new ComputerPlayer2(possibleWords, computerDifficulty, usedWords, grid); // Reset the CPU
+                }
                 shakeUpBoard.setEnabled(false);
             }
         });
@@ -276,10 +291,14 @@ public class BoggleGameScreen extends JFrame {
                 
                 // Reset all componenets
                 createGrid(grid, board); // Create a new grid and board
-                cpu = new ComputerPlayer(grid, usedWords, minLength); // Create a new CPU
-                ArrayList<String> possibleWords = BoggleAlgorithms.getAllWords(grid, dictionary, minLength); // Get the new list of possible words
-                totalWords = possibleWords.size(); // Update the new total words
+                possibleWords = BoggleAlgorithms.getAllWords(grid, dictionary, minLength); // Get the new list of possible words
                 usedWords.clear(); // Clear all the past used words
+                if (computerMode.equals("Basic")) {
+                    cpu = new ComputerPlayer(grid, usedWords, minLength); // Create a new CPU
+                } else {
+                    cpu2 = new ComputerPlayer2(possibleWords, computerDifficulty, usedWords, grid); // Create a new CPU
+                }
+                totalWords = possibleWords.size(); // Update the new total words
                 assignWordLengths(possibleWords); // Update the new number of words at each length
                 
                 // Reset the scores
@@ -532,7 +551,12 @@ public class BoggleGameScreen extends JFrame {
      */
     private void runComputerLogic() {
         try {
-            ArrayList<int[]> path = cpu.getComputerWordPath(); // Get the path of the random word
+            ArrayList<int[]> path;
+            if (computerMode.equals("Basic")) {
+                path = cpu.getComputerWordPath(); // Get the path of the random word
+            } else {
+                path = cpu2.getComputerWordPath();  // Get the path of the random word
+            }
             
             // Create the word formed by the path
             String word = "";
