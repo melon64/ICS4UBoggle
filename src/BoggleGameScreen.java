@@ -241,7 +241,7 @@ public class BoggleGameScreen extends JFrame {
 
         winner = new JLabel("The winner is ", JLabel.CENTER);
         pauseButton = new JButton("PAUSE");
-        shakeUpBoard = new JButton("Shake-up the board?");
+        shakeUpBoard = new JButton("SHAKE-UP THE BOARD?");
         restartButton = new JButton("RESTART");
         exitButton = new JButton("EXIT TO MENU");
 
