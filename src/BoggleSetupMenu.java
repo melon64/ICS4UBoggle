@@ -38,12 +38,15 @@ public class BoggleSetupMenu extends JFrame {
         
         setTitle("Boggle Setup Menu");
         setSize(400, 375);
+        getContentPane().setBackground(BoggleGameScreen.LIGHT_BLUE);
         
         mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+        mainPanel.setBackground(BoggleGameScreen.LIGHT_BLUE);
         
         settingsPanel = new JPanel();
         settingsPanel.setLayout(new GridBagLayout());
+        settingsPanel.setBackground(BoggleGameScreen.LIGHT_BLUE);
         GridBagConstraints constraints = new GridBagConstraints();
         constraints.insets = new Insets(5, 5, 5, 5);
 
@@ -113,6 +116,7 @@ public class BoggleSetupMenu extends JFrame {
         
         // Create a slider which ranges from 3 to 6 and starts at 3
         wordLengthSlider = new JSlider(JSlider.HORIZONTAL, 3, 6, 3);
+        wordLengthSlider.setBackground(BoggleGameScreen.LIGHT_BLUE);
         wordLengthSlider.setPreferredSize(new Dimension(100, 45));
         wordLengthSlider.setMajorTickSpacing(1);
         wordLengthSlider.setPaintTicks(true);
