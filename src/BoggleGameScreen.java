@@ -276,11 +276,14 @@ public class BoggleGameScreen extends JFrame {
                 startTimer(); // Reset the timer
                 createGrid(grid, board); // Reset the board
                 possibleWords = BoggleAlgorithms.getAllWords(grid, dictionary, minLength); // Get the new list of possible words
+                usedWords.clear(); // Clear all the past used words
                 if (computerMode.equals("Basic")) {
                     basicCPU = new BasicComputerPlayer(grid, usedWords, minLength); // Reset the CPU
                 } else {
                     adjustableCPU = new AdjustableComputerPlayer(possibleWords, computerDifficulty, usedWords, grid); // Reset the CPU
                 }
+                totalWords = possibleWords.size();
+                assignWordLengths(possibleWords);
                 shakeUpBoard.setEnabled(false);
             }
         });
@@ -504,7 +507,7 @@ public class BoggleGameScreen extends JFrame {
                 new BoggleMusicPlayer("ICS4UBoggle/audio/sound_effects/", "Timer", false);
                 elapsed = currDuration;
                 pausedTime = 0;
-                if (passedTurns == 4) { // Both players have passed twice
+                if (passedTurns + 1 == 4) { // Both players have passed twice after this time
                     passedTurns = 0;
                     // shake up the board
                     shakeUpBoard.setEnabled(true);
