@@ -14,7 +14,7 @@ public class ComputerPlayer {
 
     private int rows; // y
     private int cols; // x
-    private int minLength = 3;
+    private int minLength;
 
     private ArrayList<String> dictionary = BoggleAlgorithms.getDictionaryFromFile();
     private Stack<Cell> letterStack = new Stack<>();
@@ -61,11 +61,9 @@ public class ComputerPlayer {
         getComputerWord();
         
         ArrayList<int[]> list = new ArrayList<>();
-        String word = "";
         
         for (Cell cell : letterStack) {
             list.add(new int[]{cell.x, cell.y});
-            word = word += cell.getLetter();
         }
 
         return list;
