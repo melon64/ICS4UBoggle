@@ -416,4 +416,41 @@ public class BoggleAlgorithms {
         }
         return dictionary;
     }
+
+    /**
+     * This method sorts a list of words in ascending length order. It does this by putting 
+     * each word into a separate array list based on how long it is and then combining all the 
+     * lists into one at the very end. This method of sorting can only be used for categorical 
+     * data (this data is categorical because there is a finite number of word lengths). It is 
+     * simpler and faster than quick sort for smaller word lists (i.e. up to 300 words).
+     * 
+     * @param wordList The list of words that needs to be sorted
+     * @return         A sorted version of wordList
+     */
+    public static ArrayList<String> sortWordList(ArrayList<String> wordList) {
+        int minWordLength = 9999;
+        int maxWordLength = 0;
+        for (String word: wordList) {
+            if (word.length() < minWordLength) {
+                minWordLength = word.length();
+            }
+            if (word.length() > maxWordLength) {
+                maxWordLength = word.length();
+            }
+        }
+        
+        ArrayList<String>[] wordsByLength = (ArrayList<String>[]) new ArrayList[maxWordLength - minWordLength + 1];
+        for (int i = 0; i < wordsByLength.length; i++) {
+            wordsByLength[i] = new ArrayList<String>();
+        }
+        for (String word: wordList) {
+            wordsByLength[word.length() - minWordLength].add(word);
+        }
+        
+        ArrayList<String> sortedWordList = new ArrayList<String>();
+        for (ArrayList<String> wordsForLength: wordsByLength) {
+            sortedWordList.addAll(wordsForLength);
+        }
+        return sortedWordList;
+    }
 }
