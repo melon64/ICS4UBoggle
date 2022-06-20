@@ -60,6 +60,7 @@ public class BoggleGameScreen extends JFrame {
     private final ArrayList<char[]> dice = readDiceDistribution();
 
     private BoggleMusicPlayer bgm;
+    public boolean musicPlaying;
     
     private BasicComputerPlayer basicCPU;
     private AdjustableComputerPlayer adjustableCPU;
@@ -76,7 +77,12 @@ public class BoggleGameScreen extends JFrame {
         setSize(width, height);
         setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
 
-        bgm = new BoggleMusicPlayer("ICS4UBoggle/audio/", track, true);
+        if (!track.equals("NONE")) {
+            bgm = new BoggleMusicPlayer("ICS4UBoggle/audio/", track, true);
+            musicPlaying = true;
+        } else {
+            musicPlaying = false;
+        }
 
         inputPanel = new JPanel();
         inputPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 10));
@@ -323,7 +329,9 @@ public class BoggleGameScreen extends JFrame {
                     changeTurn();
                 }
                 hasRestarted = true;
-                bgm.unpauseClip();
+                if (musicPlaying) {
+                    bgm.unpauseClip();
+                }
                 startTimer();
                 hasRestarted = false;
             }
@@ -332,7 +340,9 @@ public class BoggleGameScreen extends JFrame {
         exitButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                bgm.pauseClip();
+                if (musicPlaying) {
+                    bgm.pauseClip();
+                }
                 dispose();
                 new BoggleSetupMenu();
             }
@@ -435,7 +445,9 @@ public class BoggleGameScreen extends JFrame {
                 }
                 if (winnerDecided) {
                     winner.setVisible(true);
-                    bgm.pauseClip();
+                    if (musicPlaying) {
+                        bgm.pauseClip();
+                    }
                     new BoggleMusicPlayer("ICS4UBoggle/audio/sound_effects/", "Winner", false);
                     timer.stop();
                     submitButton.setEnabled(false);

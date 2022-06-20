@@ -317,11 +317,14 @@ public class BoggleSetupMenu extends JFrame {
     public static String[] getMusicFileNames() {
         File file = new File("ICS4UBoggle/audio");
         String[] fileArr = file.list();
-        ArrayList<String> musicList = new ArrayList<String>();
         // The following is the extension that the program is looking for, so it 
         // will ignore all files that do not have this extension
         String expectedExtension = ".wav";
 
+        ArrayList<String> musicList = new ArrayList<String>();
+        // Add an option to not play music at all
+        musicList.add("NONE");
+        
         for (int i = 0; i < fileArr.length; i++) {
             // Only add the file to te list if it is a music file
             if (fileArr[i].substring(fileArr[i].length() - 4, fileArr[i].length()).equals(expectedExtension)) {
