@@ -8,7 +8,6 @@ package ICS4UBoggle.src.ai;
 
 import java.util.ArrayList;
 import java.util.Random;
-import java.lang.Math;
 import ICS4UBoggle.src.BoggleAlgorithms;
 
 public class AdjustableComputerPlayer {

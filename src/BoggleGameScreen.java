@@ -445,6 +445,9 @@ public class BoggleGameScreen extends JFrame {
 
                 // Display the amount of words left
                 int index = wordGuessed.length() - (maxDisplayedLength - wordLengths.length + 1);
+                if (wordGuessed.length() > 8) {
+                    index -= wordGuessed.length() - maxDisplayedLength;
+                }
                 totalWordsLabel.setText(usedWords.size() + "/" + totalWords + " WORDS");
                 wordLengths[index]--;
                 wordLengthsLabels[index].setText(wordGuessed.length() + ": " + wordLengths[index]);
@@ -491,7 +494,7 @@ public class BoggleGameScreen extends JFrame {
             } else if (wordGuessed.length() > 0) {
                 wordResult.setText(wordGuessed + " is less than the minimum length of " + minLength);
             } else {
-                wordResult.setText("Please type a word in the box before hitting submit");
+                wordResult.setText("Please create a word using the buttons before hitting submit");
             }
         }
         // Clean up the board
