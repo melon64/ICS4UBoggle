@@ -354,6 +354,7 @@ public class BoggleGameScreen extends JFrame {
                 }
                 hasRestarted = true;
                 if (musicPlaying) {
+                    bgm.endClip();
                     bgm = new BoggleMusicPlayer("ICS4UBoggle/audio/", track, true);
                 }
                 startTimer();
