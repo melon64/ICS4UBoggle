@@ -9,7 +9,7 @@ package ICS4UBoggle.src.ai;
 import java.util.*;
 import ICS4UBoggle.src.BoggleAlgorithms;
 
-public class ComputerPlayer {
+public class BasicComputerPlayer {
     private Cell[][] cells;
 
     private int rows; // y
@@ -36,7 +36,7 @@ public class ComputerPlayer {
      * @param usedWords The list of already guessed words
      * @param minLength The minimum length required for guessed words
      */
-    public ComputerPlayer(char[][] boggleGrid, ArrayList<String> usedWords, int minLength) {
+    public BasicComputerPlayer(char[][] boggleGrid, ArrayList<String> usedWords, int minLength) {
         rows = boggleGrid.length;
         cols = boggleGrid[0].length;
 

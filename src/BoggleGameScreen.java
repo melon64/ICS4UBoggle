@@ -60,8 +60,8 @@ public class BoggleGameScreen extends JFrame {
 
     private BoggleMusicPlayer bgm;
     
-    private ComputerPlayer cpu;
-    private ComputerPlayer2 cpu2;
+    private BasicComputerPlayer basicCPU;
+    private AdjustableComputerPlayer adjustableCPU;
     private String computerMode;
 
     ArrayList<String> possibleWords;
@@ -191,9 +191,9 @@ public class BoggleGameScreen extends JFrame {
         
         this.computerMode = computerMode;
         if (computerMode.equals("Basic")) {
-            cpu = new ComputerPlayer(grid, usedWords, minLength);
+            basicCPU = new BasicComputerPlayer(grid, usedWords, minLength);
         } else {
-            cpu2 = new ComputerPlayer2(possibleWords, computerDifficulty, usedWords, grid);
+            adjustableCPU = new AdjustableComputerPlayer(possibleWords, computerDifficulty, usedWords, grid);
         }
 
         // ====================================
@@ -277,9 +277,9 @@ public class BoggleGameScreen extends JFrame {
                 createGrid(grid, board); // Reset the board
                 possibleWords = BoggleAlgorithms.getAllWords(grid, dictionary, minLength); // Get the new list of possible words
                 if (computerMode.equals("Basic")) {
-                    cpu = new ComputerPlayer(grid, usedWords, minLength); // Reset the CPU
+                    basicCPU = new BasicComputerPlayer(grid, usedWords, minLength); // Reset the CPU
                 } else {
-                    cpu2 = new ComputerPlayer2(possibleWords, computerDifficulty, usedWords, grid); // Reset the CPU
+                    adjustableCPU = new AdjustableComputerPlayer(possibleWords, computerDifficulty, usedWords, grid); // Reset the CPU
                 }
                 shakeUpBoard.setEnabled(false);
             }
@@ -294,9 +294,9 @@ public class BoggleGameScreen extends JFrame {
                 possibleWords = BoggleAlgorithms.getAllWords(grid, dictionary, minLength); // Get the new list of possible words
                 usedWords.clear(); // Clear all the past used words
                 if (computerMode.equals("Basic")) {
-                    cpu = new ComputerPlayer(grid, usedWords, minLength); // Create a new CPU
+                    basicCPU = new BasicComputerPlayer(grid, usedWords, minLength); // Create a new CPU
                 } else {
-                    cpu2 = new ComputerPlayer2(possibleWords, computerDifficulty, usedWords, grid); // Create a new CPU
+                    adjustableCPU = new AdjustableComputerPlayer(possibleWords, computerDifficulty, usedWords, grid); // Create a new CPU
                 }
                 totalWords = possibleWords.size(); // Update the new total words
                 assignWordLengths(possibleWords); // Update the new number of words at each length
@@ -553,9 +553,9 @@ public class BoggleGameScreen extends JFrame {
         try {
             ArrayList<int[]> path;
             if (computerMode.equals("Basic")) {
-                path = cpu.getComputerWordPath(); // Get the path of the random word
+                path = basicCPU.getComputerWordPath(); // Get the path of the random word
             } else {
-                path = cpu2.getComputerWordPath();  // Get the path of the random word
+                path = adjustableCPU.getComputerWordPath();  // Get the path of the random word
             }
             
             // Create the word formed by the path

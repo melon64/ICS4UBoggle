@@ -11,13 +11,13 @@ import java.util.Random;
 import java.lang.Math;
 import ICS4UBoggle.src.BoggleAlgorithms;
 
-public class ComputerPlayer2 {
+public class AdjustableComputerPlayer {
     ArrayList<String> possibleWords;
     int computerDifficulty;
     ArrayList<String> usedWords;
     char[][] boggleBoard;
 
-    public ComputerPlayer2(ArrayList<String> possibleWords, int computerDifficulty, ArrayList<String> usedWords, char[][] boggleBoard) {
+    public AdjustableComputerPlayer(ArrayList<String> possibleWords, int computerDifficulty, ArrayList<String> usedWords, char[][] boggleBoard) {
         this.possibleWords = BoggleAlgorithms.sortWordList(possibleWords);
         this.computerDifficulty = computerDifficulty;
         this.usedWords = usedWords;
