@@ -18,4 +18,4 @@ Computer Mode
 Which computer opponent you want to play against. The basic one randomly picks a cell and tries to make a word starting from that cell. The adjustable one randomly picks a word from a list of valid guesses and makes that guess - its difficulty can also be tweaked with the next option.
 
 Computer Difficulty
-How well the computer opponent plays. It is only an option if you have selected the adjustable computer opponent.
+How well the computer opponent plays. It is only an option if you have selected the adjustable computer opponent. Selecting a computer difficulty of 10 will mean that the computer will always make the best possible guess.
