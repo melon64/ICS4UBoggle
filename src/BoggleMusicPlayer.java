@@ -17,6 +17,7 @@ public class BoggleMusicPlayer {
     // It has the volatile modifier because manageClipPlayback must continuously get the 
     // newest value of clipPaused
     volatile boolean clipPaused;
+    volatile boolean clipEnded;
     
     public BoggleMusicPlayer(String trackPath, String trackName, boolean doLoop) {
         // Create a new thread for playing the audio file so that this is done in the 
@@ -28,6 +29,7 @@ public class BoggleMusicPlayer {
                     AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(
                         new File(trackPath + trackName + MUSIC_EXTENSION).getAbsoluteFile());
                     clipPaused = false;
+                    clipEnded = false;
 
                     Clip clip = AudioSystem.getClip();
                     clip.open(audioInputStream);
@@ -35,7 +37,7 @@ public class BoggleMusicPlayer {
                         clip.loop(Clip.LOOP_CONTINUOUSLY);
                     }
                     clip.start();
-                    manageClipPlayback(clip, doLoop);
+                    manageClipPlayback(clip, doLoop, trackName);
                 } 
                 catch (UnsupportedAudioFileException e) {e.printStackTrace();} 
                 catch (IOException e) {e.printStackTrace();} 
@@ -49,9 +51,9 @@ public class BoggleMusicPlayer {
      * 
      * @param clip The clip that is to be played
      */
-    public void manageClipPlayback(Clip clip, boolean doLoop) {
+    public void manageClipPlayback(Clip clip, boolean doLoop, String track) {
         long currPosition = -1;
-        while (clip.isOpen()) {
+        while (!clipEnded && clip.getMicrosecondLength() != clip.getMicrosecondPosition()) {
             if (clipPaused) {
                 if (currPosition == -1) {
                     currPosition = clip.getMicrosecondPosition();
@@ -68,6 +70,7 @@ public class BoggleMusicPlayer {
                 }
             }
         }
+        clip.stop();
     }
 
     /**
@@ -82,6 +85,15 @@ public class BoggleMusicPlayer {
      */
     public void unpauseClip() {
         clipPaused = false;
+    }
+
+    /**
+     * This method ends the clip
+     * 
+     * @return Whether or not the clip is paused
+     */
+    public void endClip() {
+        clipEnded = true;
     }
 
     /**

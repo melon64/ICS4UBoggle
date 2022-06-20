@@ -354,7 +354,7 @@ public class BoggleGameScreen extends JFrame {
                 }
                 hasRestarted = true;
                 if (musicPlaying) {
-                    bgm.unpauseClip();
+                    bgm = new BoggleMusicPlayer("ICS4UBoggle/audio/", track, true);
                 }
                 startTimer();
                 hasRestarted = false;
@@ -365,7 +365,7 @@ public class BoggleGameScreen extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (musicPlaying) {
-                    bgm.pauseClip();
+                    bgm.endClip();
                 }
                 dispose();
                 new BoggleSetupMenu();
@@ -476,7 +476,7 @@ public class BoggleGameScreen extends JFrame {
                 if (winnerDecided) {
                     winner.setVisible(true);
                     if (musicPlaying) {
-                        bgm.pauseClip();
+                        bgm.endClip();
                     }
                     new BoggleMusicPlayer("ICS4UBoggle/audio/sound_effects/", "Winner", false);
                     timer.stop();
