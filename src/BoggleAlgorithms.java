@@ -19,13 +19,13 @@ public class BoggleAlgorithms {
      *              to form the word - each array contains an x and a y coordinate; 
      *              returns an empty array list if the word isn't found
      */
-    public static ArrayList<Integer[]> getWordPath(char[][] board, String word) {
+    public static ArrayList<int[]> getWordPath(char[][] board, String word) {
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board[0].length; j++) {
                 if (board[i][j] == word.charAt(0)) {
-                    ArrayList<Integer[]> currWordPath = new ArrayList<Integer[]>();
-                    currWordPath.add(new Integer[]{i, j});
-                    ArrayList<Integer[]> wordPath = getWordPathFromPos(board, word.substring(1, word.length()), i, j, currWordPath);
+                    ArrayList<int[]> currWordPath = new ArrayList<int[]>();
+                    currWordPath.add(new int[]{i, j});
+                    ArrayList<int[]> wordPath = getWordPathFromPos(board, word.substring(1, word.length()), i, j, currWordPath);
                     if (wordPath.size() > 0) {
                         // If the program finds the rest of the word if its starts at a 
                         // specific position, return the path of letters used to form the word
@@ -36,7 +36,7 @@ public class BoggleAlgorithms {
         }
         
         // If the program didn't find the word on the board yet, return an empty path
-        return new ArrayList<Integer[]>();
+        return new ArrayList<int[]>();
     }
     
     /**
@@ -58,7 +58,7 @@ public class BoggleAlgorithms {
      *                 the word; returns an empty array list if the word cannot be made 
      *                 from the start position
      */
-    public static ArrayList<Integer[]> getWordPathFromPos(char[][] board, String word, int currRow, int currCol, ArrayList<Integer[]> wordPath) {
+    public static ArrayList<int[]> getWordPathFromPos(char[][] board, String word, int currRow, int currCol, ArrayList<int[]> wordPath) {
         if (word.length() == 0) {
             return wordPath;
         } else {
@@ -75,8 +75,8 @@ public class BoggleAlgorithms {
                 // the board so that it isn't reused (as this would be illegal)
                 newBoard[currRow][currCol] = ' ';
                 
-                ArrayList<Integer[]> newWordPath = cloneIntegerArrList(wordPath);
-                newWordPath.add(new Integer[]{currRow + move[0], currCol + move[1]});
+                ArrayList<int[]> newWordPath = cloneIntegerArrList(wordPath);
+                newWordPath.add(new int[]{currRow + move[0], currCol + move[1]});
                 // Make a recursive call to check if the rest of the word can be formed
                 newWordPath = getWordPathFromPos(newBoard, newWord, currRow + move[0], currCol + move[1], newWordPath);
                 if (newWordPath.size() > 0) {
@@ -86,7 +86,7 @@ public class BoggleAlgorithms {
             
             // If the program didn't find the word on the board from the starting 
             // position yet, return false
-            return new ArrayList<Integer[]>();
+            return new ArrayList<int[]>();
         }
     }
 
@@ -267,10 +267,10 @@ public class BoggleAlgorithms {
      * @param arrList The array list that needs to be clones
      * @return        A deep copy of the array list of integer arrays
      */
-    public static ArrayList<Integer[]> cloneIntegerArrList(ArrayList<Integer[]> arrList) {
-        ArrayList<Integer[]> newArrList = new ArrayList<Integer[]>();
+    public static ArrayList<int[]> cloneIntegerArrList(ArrayList<int[]> arrList) {
+        ArrayList<int[]> newArrList = new ArrayList<int[]>();
         for (int i = 0; i < arrList.size(); i++) {
-            Integer[] intArr = new Integer[arrList.get(i).length];
+            int[] intArr = new int[arrList.get(i).length];
             for (int j = 0; j < intArr.length; j++) {
                 intArr[j] = arrList.get(i)[j];
             }
@@ -415,5 +415,42 @@ public class BoggleAlgorithms {
             System.out.println(exception);
         }
         return dictionary;
+    }
+
+    /**
+     * This method sorts a list of words in ascending length order. It does this by putting 
+     * each word into a separate array list based on how long it is and then combining all the 
+     * lists into one at the very end. This method of sorting can only be used for categorical 
+     * data (this data is categorical because there is a finite number of word lengths). It is 
+     * simpler and faster than quick sort for smaller word lists (i.e. up to 300 words).
+     * 
+     * @param wordList The list of words that needs to be sorted
+     * @return         A sorted version of wordList
+     */
+    public static ArrayList<String> sortWordList(ArrayList<String> wordList) {
+        int minWordLength = 9999;
+        int maxWordLength = 0;
+        for (String word: wordList) {
+            if (word.length() < minWordLength) {
+                minWordLength = word.length();
+            }
+            if (word.length() > maxWordLength) {
+                maxWordLength = word.length();
+            }
+        }
+        
+        ArrayList<String>[] wordsByLength = (ArrayList<String>[]) new ArrayList[maxWordLength - minWordLength + 1];
+        for (int i = 0; i < wordsByLength.length; i++) {
+            wordsByLength[i] = new ArrayList<String>();
+        }
+        for (String word: wordList) {
+            wordsByLength[word.length() - minWordLength].add(word);
+        }
+        
+        ArrayList<String> sortedWordList = new ArrayList<String>();
+        for (ArrayList<String> wordsForLength: wordsByLength) {
+            sortedWordList.addAll(wordsForLength);
+        }
+        return sortedWordList;
     }
 }

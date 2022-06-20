@@ -1,3 +1,0 @@
-This folder is intended to hold all the music files that the user can choose from in the Boggle game
-Feel free to add any music files you think appropriate for this game
-Music files should be in the format: "<trackName>.wav" (.mp3 files will not work)

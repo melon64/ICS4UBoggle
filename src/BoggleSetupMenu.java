@@ -25,6 +25,10 @@ public class BoggleSetupMenu extends JFrame {
     JSpinner scoreSpinner;
     JLabel musicLabel;
     JComboBox<String> musicChoiceBox;
+    JLabel computerModeLabel;
+    JComboBox<String> computerModeChoiceBox;
+    JLabel computerDifficultyLabel;
+    JSlider computerDifficultySlider;
     JButton startButton;
     
     public BoggleSetupMenu() {
@@ -33,7 +37,7 @@ public class BoggleSetupMenu extends JFrame {
         // ====================================
         
         setTitle("Boggle Setup Menu");
-        setSize(325, 300);
+        setSize(400, 375);
         getContentPane().setBackground(BoggleGameScreen.LIGHT_BLUE);
         
         mainPanel = new JPanel();
@@ -60,6 +64,20 @@ public class BoggleSetupMenu extends JFrame {
         settingsPanel.add(modeLabel, constraints);
 
         modeChoiceBox = new JComboBox<String>(new String[]{"Single Player", "Two Player"});
+        modeChoiceBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (modeChoiceBox.getSelectedItem().equals("Two Player")) {
+                    computerModeChoiceBox.setEnabled(false);
+                    computerDifficultySlider.setEnabled(false);
+                } else {
+                    computerModeChoiceBox.setEnabled(true);
+                    if (computerModeChoiceBox.getSelectedItem().equals("Adjustable")) {
+                        computerDifficultySlider.setEnabled(true);
+                    }
+                }
+            }
+        });
         constraints.gridx = 1;
         constraints.gridy = 0;
         constraints.anchor = GridBagConstraints.WEST;
@@ -146,7 +164,54 @@ public class BoggleSetupMenu extends JFrame {
         settingsPanel.add(musicChoiceBox, constraints);
 
         // ====================================
-        // SUBMIT BUTTON SECTION
+        // COMPUTER MODE SELECTION SECTION
+        // ====================================
+        
+        computerModeLabel = new JLabel("Computer Mode:");
+        constraints.gridx = 0;
+        constraints.gridy = 5;
+        constraints.anchor = GridBagConstraints.EAST;
+        settingsPanel.add(computerModeLabel, constraints);
+
+        computerModeChoiceBox = new JComboBox<String>(new String[]{"Adjustable", "Basic"});
+        computerModeChoiceBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (computerModeChoiceBox.getSelectedItem().equals("Basic")) {
+                    computerDifficultySlider.setEnabled(false);
+                } else {
+                    computerDifficultySlider.setEnabled(true);
+                }
+            }
+        });
+        constraints.gridx = 1;
+        constraints.gridy = 5;
+        constraints.anchor = GridBagConstraints.WEST;
+        settingsPanel.add(computerModeChoiceBox, constraints);
+        
+        // ====================================
+        // COMPUTER DIFFICULTY SETTING SECTION
+        // ====================================
+        
+        computerDifficultyLabel = new JLabel("Computer Difficulty:");
+        constraints.gridx = 0;
+        constraints.gridy = 6;
+        constraints.anchor = GridBagConstraints.EAST;
+        settingsPanel.add(computerDifficultyLabel, constraints);
+        
+        // Create a slider which ranges from 1 to 10 and starts at 5
+        computerDifficultySlider = new JSlider(JSlider.HORIZONTAL, 1, 10, 5);
+        computerDifficultySlider.setPreferredSize(new Dimension(150, 45));
+        computerDifficultySlider.setMajorTickSpacing(1);
+        computerDifficultySlider.setPaintTicks(true);
+        computerDifficultySlider.setPaintLabels(true);
+        constraints.gridx = 1;
+        constraints.gridy = 6;
+        constraints.anchor = GridBagConstraints.WEST;
+        settingsPanel.add(computerDifficultySlider, constraints);
+
+        // ====================================
+        // START BUTTON SECTION
         // ====================================
 
         startButton = new JButton("Start Game!");
@@ -162,9 +227,11 @@ public class BoggleSetupMenu extends JFrame {
                 int duration = getTimerDuration();
                 int minLength = getMinLength();
                 String track = getTrack();
+                String computerMode = getComputerMode();
+                int computerDifficulty = getComputerDifficulty();
                 dispose();
                 instructionPanel.dispose();
-                new BoggleGameScreen(gameMode, tournamentScore, duration, minLength, track);
+                new BoggleGameScreen(gameMode, tournamentScore, duration, minLength, track, computerMode, computerDifficulty);
             }
         });
 
@@ -229,6 +296,24 @@ public class BoggleSetupMenu extends JFrame {
     }
 
     /**
+     * This function gets the computer mode that was chosen
+     * 
+     * @return A string of the computer mode that was chosen
+     */
+    public String getComputerMode() {
+        return computerModeChoiceBox.getSelectedItem().toString();
+    }
+
+    /**
+     * This function gets the computer difficulty that was chosen
+     * 
+     * @return The computer difficulty integer that was chosen
+     */
+    public int getComputerDifficulty() {
+        return computerDifficultySlider.getValue();
+    }
+
+    /**
      * This function gets a list of all the music files in the music directory
      * 
      * @return A list of all the files in the music directory
@@ -236,11 +321,14 @@ public class BoggleSetupMenu extends JFrame {
     public static String[] getMusicFileNames() {
         File file = new File("ICS4UBoggle/audio");
         String[] fileArr = file.list();
-        ArrayList<String> musicList = new ArrayList<String>();
         // The following is the extension that the program is looking for, so it 
         // will ignore all files that do not have this extension
         String expectedExtension = ".wav";
 
+        ArrayList<String> musicList = new ArrayList<String>();
+        // Add an option to not play music at all
+        musicList.add("NONE");
+        
         for (int i = 0; i < fileArr.length; i++) {
             // Only add the file to te list if it is a music file
             if (fileArr[i].substring(fileArr[i].length() - 4, fileArr[i].length()).equals(expectedExtension)) {

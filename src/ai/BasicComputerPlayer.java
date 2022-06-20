@@ -9,12 +9,12 @@ package ICS4UBoggle.src.ai;
 import java.util.*;
 import ICS4UBoggle.src.BoggleAlgorithms;
 
-public class ComputerPlayer {
+public class BasicComputerPlayer {
     private Cell[][] cells;
 
     private int rows; // y
     private int cols; // x
-    private int minLength = 3;
+    private int minLength;
 
     private ArrayList<String> dictionary = BoggleAlgorithms.getDictionaryFromFile();
     private Stack<Cell> letterStack = new Stack<>();
@@ -36,7 +36,7 @@ public class ComputerPlayer {
      * @param usedWords The list of already guessed words
      * @param minLength The minimum length required for guessed words
      */
-    public ComputerPlayer(char[][] boggleGrid, ArrayList<String> usedWords, int minLength) {
+    public BasicComputerPlayer(char[][] boggleGrid, ArrayList<String> usedWords, int minLength) {
         rows = boggleGrid.length;
         cols = boggleGrid[0].length;
 
@@ -61,11 +61,9 @@ public class ComputerPlayer {
         getComputerWord();
         
         ArrayList<int[]> list = new ArrayList<>();
-        String word = "";
         
         for (Cell cell : letterStack) {
             list.add(new int[]{cell.x, cell.y});
-            word = word += cell.getLetter();
         }
 
         return list;
