@@ -435,8 +435,10 @@ public class BoggleGameScreen extends JFrame {
         } else {
             if (usedWord) {
                 wordResult.setText(wordGuessed + " has already been used");
-            } else {
+            } else if (wordGuessed.length() > 0) {
                 wordResult.setText(wordGuessed + " is less than the minimum length of " + minLength);
+            } else {
+                wordResult.setText("Please type a word in the box before hitting submit");
             }
         }
         // Clean up the board
