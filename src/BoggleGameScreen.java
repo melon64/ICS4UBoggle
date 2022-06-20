@@ -54,6 +54,13 @@ public class BoggleGameScreen extends JFrame {
     private boolean isPaused = false;
     private boolean hasRestarted = false;
 
+    // Colour scheme
+    public static final Color LIGHT_BLUE = new Color(218, 234, 241);
+    public static final Color LIGHT_PINK = new Color(255, 230, 230);
+    public static final Color COBALT_BLUE = new Color(0, 71, 171);
+    public static final Color CARDINAL_RED = new Color(196, 30, 58);
+    public static final Color LIME_GREEN = new Color(50, 205, 50);
+    
     public final ArrayList<String> usedWords = new ArrayList<String>();
     private final ArrayList<String> dictionary = BoggleAlgorithms.getDictionaryFromFile();
     private final ArrayList<char[]> dice = readDiceDistribution();
@@ -69,6 +76,7 @@ public class BoggleGameScreen extends JFrame {
         setTitle("Boggle Game Screen");
         setSize(width, height);
         setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
+        getContentPane().setBackground(LIGHT_BLUE);
 
         bgm = new BoggleMusicPlayer("ICS4UBoggle/audio/", track, true);
 
@@ -76,27 +84,33 @@ public class BoggleGameScreen extends JFrame {
         inputPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 10));
         inputPanel.setPreferredSize(new Dimension(width, 100));
         inputPanel.setMaximumSize(new Dimension(width, 100));
+        inputPanel.setBackground(LIGHT_BLUE);
 
         timerPanel = new JPanel();
         timerPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
         timerPanel.setMaximumSize(new Dimension(width, 50));
+        timerPanel.setBackground(LIGHT_BLUE);
 
         wordResultPanel = new JPanel();
         wordResultPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
         wordResultPanel.setPreferredSize(new Dimension(width, 140));
         wordResultPanel.setMaximumSize(new Dimension(width, 140));
+        wordResultPanel.setBackground(LIGHT_BLUE);
 
         boardPanel = new JPanel();
         boardPanel.setLayout(new GridLayout(5, 5));
         boardPanel.setPreferredSize(new Dimension(width, 300));
+        boardPanel.setBackground(LIGHT_BLUE);
 
         scorePanel = new JPanel();
         scorePanel.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 10));
         scorePanel.setPreferredSize(new Dimension(width, 50));
         scorePanel.setMaximumSize(new Dimension(width, 50));
+        scorePanel.setBackground(LIGHT_BLUE);
 
         outputPanel = new JPanel();
         outputPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 50));
+        outputPanel.setBackground(LIGHT_BLUE);
 
         Font defaultFont = new Font("Dialog", Font.PLAIN, 18);
         Font defaultBoldFont = new Font("Dialog", Font.BOLD, 18);
@@ -133,8 +147,8 @@ public class BoggleGameScreen extends JFrame {
         wordInput2.setOpaque(true);
         playerIndication.setFont(defaultBoldFont);
         playerIndication2.setFont(defaultBoldFont);
-        playerIndication.setForeground(Color.BLUE);
-        playerIndication2.setForeground(Color.RED);
+        playerIndication.setForeground(COBALT_BLUE);
+        playerIndication2.setForeground(CARDINAL_RED);
         wordInput.setFont(defaultBoldFont);
         wordInput2.setFont(defaultBoldFont);
 
@@ -217,6 +231,8 @@ public class BoggleGameScreen extends JFrame {
         scoreLabel.setFont(defaultFont);
         scoreLabel2.setFont(defaultFont);
         tournamentScoreLabel.setFont(defaultBoldFont);
+        scoreLabel.setForeground(COBALT_BLUE);
+        scoreLabel2.setForeground(CARDINAL_RED);
         scoreLabel.setPreferredSize(new Dimension(420, 50));
         scoreLabel2.setPreferredSize(new Dimension(400, 50));
         tournamentScoreLabel.setPreferredSize(new Dimension(200, 50));
@@ -553,7 +569,7 @@ public class BoggleGameScreen extends JFrame {
                         }
                         else {
                             // Show the path formed by the computer's word on the board
-                            board[path.get(0)[1]][path.get(0)[0]].setBackground(Color.GREEN);
+                            board[path.get(0)[1]][path.get(0)[0]].setBackground(LIME_GREEN);
                             wordInput2.setText(wordInput2.getText() + grid[path.get(0)[1]][path.get(0)[0]]);
                             path.remove(0);
                         }
@@ -583,7 +599,7 @@ public class BoggleGameScreen extends JFrame {
         // Reset the colour of the board
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board[0].length; j++) {
-                board[i][j].setBackground(Color.WHITE);
+                board[i][j].setBackground(LIGHT_PINK);
             }
         }
     }
@@ -643,7 +659,7 @@ public class BoggleGameScreen extends JFrame {
                 board[i][j] = new JButton("" + letter);
                 board[i][j].setFont(new Font("Dialog", Font.BOLD, 24));
                 board[i][j].setBorder(BorderFactory.createLineBorder(Color.BLACK));
-                board[i][j].setBackground(Color.WHITE);
+                board[i][j].setBackground(LIGHT_PINK);
 
                 final int x = i, y = j;
                 board[i][j].addActionListener(new ActionListener() {
@@ -652,10 +668,10 @@ public class BoggleGameScreen extends JFrame {
                         int[] lastCoords = path.isEmpty() ? new int[] { 0, 0 } : path.get(path.size() - 1);
                         // If current cell is being used in the path and is the last inputed letter
                         if (!getCurrentPlayer().equals("Computer Player") && !isPaused) {
-                            if (board[x][y].getBackground() == Color.GREEN && x == lastCoords[0]
+                            if (board[x][y].getBackground() == LIME_GREEN && x == lastCoords[0]
                                     && y == lastCoords[1]) {
                                 // Undo selection
-                                board[x][y].setBackground(Color.WHITE);
+                                board[x][y].setBackground(LIGHT_PINK);
                                 if (!path.isEmpty()) {
                                     path.remove(path.size() - 1);
                                 }
@@ -670,12 +686,12 @@ public class BoggleGameScreen extends JFrame {
                                 }
                             }
                             // If current cell has not been used in the path
-                            else if (board[x][y].getBackground() == Color.WHITE) {
+                            else if (board[x][y].getBackground() == LIGHT_PINK) {
                                 // If the path is empty or the cell selected is adjacent to the last selected
                                 // letter
                                 if (path.isEmpty() || isAdjacent(x, y, lastCoords[0], lastCoords[1])) {
                                     // Add letter to the path
-                                    board[x][y].setBackground(Color.GREEN);
+                                    board[x][y].setBackground(LIME_GREEN);
                                     int[] coords = new int[] { x, y };
                                     path.add(coords);
 
