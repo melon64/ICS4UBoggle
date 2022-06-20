@@ -1,0 +1,11 @@
+
+Two Player Mode
+In two player mode, play will alternate between both players. When the label in the center of the frame says that it is your turn, click the buttons on the board to form a word and then click the submit button. A message will tell you whether or not your guess was valid and how many points you will recieve. Your turn ends when you make a valid guess or when your timer run out.
+The running total score for each player will be close to the bottom of the screen. The game will keep going until one player reaches the Tournament Score. When a player wins, the game will declare them as the winner.
+
+One Player Mode
+One player mode is very similar to two player mode except you will be playing against the computer. You will always be "Player 1" and will always go first. On your turn, you follow the same steps as a two player game. On the computer's turn it will automatically go and will make a guess. Both yours and the computer's turns will be timed as normal.
+
+Other Features
+The Boggle game has a number of sounds, so the full experience requires you to unmute your volume.
+There are a number of buttons at the bottom of the screen. The first one controls whether or not the game is paused - this will pause or unpause the timer. The shake up the board button will only become visible once both players have passed twice - it randomly resets the dice. The reset button resets the dice and the scores of both players. The exit to menu button will pull up the settings menu. Lastly, the help button will pull up this panel.

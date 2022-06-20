@@ -1,0 +1,21 @@
+
+Mode Choice
+Whether you want to play single player or two player.
+
+Length of Timer (Seconds)
+How long the timer lasts for each player in seconds.
+
+Minimum Word Length
+The minimum word length required to score points.
+
+Tournament score
+The number of points required for a player to win. After either player reaches this amount, they are declared the winner and the game is over
+
+Music Choice
+Which music track you want to listen to in the background. Selecting "NONE" will mean that no music is played.
+
+Computer Mode
+Which computer opponent you want to play against. The basic one randomly picks a cell and tries to make a word starting from that cell. The adjustable one randomly picks a word from a list of valid guesses and makes that guess - its difficulty can also be tweaked with the next option.
+
+Computer Difficulty
+How well the computer opponent plays. It is only an option if you have selected the adjustable computer opponent.

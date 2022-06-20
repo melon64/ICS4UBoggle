@@ -47,8 +47,8 @@ public class BoggleSetupMenu extends JFrame {
         GridBagConstraints constraints = new GridBagConstraints();
         constraints.insets = new Insets(5, 5, 5, 5);
 
-        // Create the instruction panel
-        BoggleInstructionsPanel instructionPanel = new BoggleInstructionsPanel();
+        // Create the help panel
+        BoggleHelpPanel helpPanel = new BoggleHelpPanel();
 
         // ====================================
         // MODE SELECTION SECTION
@@ -226,7 +226,7 @@ public class BoggleSetupMenu extends JFrame {
                 String computerMode = getComputerMode();
                 int computerDifficulty = getComputerDifficulty();
                 dispose();
-                instructionPanel.dispose();
+                helpPanel.dispose();
                 new BoggleGameScreen(gameMode, tournamentScore, duration, minLength, track, computerMode, computerDifficulty);
             }
         });

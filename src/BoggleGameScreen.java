@@ -38,7 +38,7 @@ public class BoggleGameScreen extends JFrame {
     JButton shakeUpBoard;
     JButton restartButton;
     JButton exitButton;
-    JButton instructionsButton;
+    JButton helpButton;
 
     private char[][] grid = new char[5][5];
     private JButton[][] board = new JButton[5][5];
@@ -254,7 +254,7 @@ public class BoggleGameScreen extends JFrame {
         shakeUpBoard = new JButton("SHAKE-UP THE BOARD?");
         restartButton = new JButton("RESTART");
         exitButton = new JButton("EXIT TO MENU");
-        instructionsButton = new JButton("SHOW INSTRUCTIONS");
+        helpButton = new JButton("HELP");
 
         winner.setFont(new Font("Dialog", Font.BOLD, 24));
         winner.setPreferredSize(new Dimension(width, 50));
@@ -352,10 +352,10 @@ public class BoggleGameScreen extends JFrame {
             }
         });
 
-        instructionsButton.addActionListener(new ActionListener() {
+        helpButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                new BoggleInstructionsPanel();
+                new BoggleHelpPanel();
                 // If the game is not paused, pause it
                 if (pauseButton.getText().equals("PAUSE")) {
                     pauseButton.doClick();
@@ -368,7 +368,7 @@ public class BoggleGameScreen extends JFrame {
         outputPanel.add(shakeUpBoard);
         outputPanel.add(restartButton);
         outputPanel.add(exitButton);
-        outputPanel.add(instructionsButton);
+        outputPanel.add(helpButton);
 
         // ====================================
         // FINALIZATION SECTION
