@@ -8,14 +8,11 @@ package ICS4UBoggle.src;
 
 import javax.swing.*;
 import javax.swing.Timer;
-
 import ICS4UBoggle.src.ai.*;
-
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.util.*;
-import java.util.stream.*;
 
 public class BoggleGameScreen extends JFrame {
     JPanel inputPanel;
@@ -57,7 +54,7 @@ public class BoggleGameScreen extends JFrame {
     private boolean hasRestarted = false;
 
     public final ArrayList<String> usedWords = new ArrayList<String>();
-    private final ArrayList<String> dictionary = getDictionaryFromFile();
+    private final ArrayList<String> dictionary = BoggleAlgorithms.getDictionaryFromFile();
     private final ArrayList<char[]> dice = readDiceDistribution();
 
     private BoggleMusicPlayer bgm;
@@ -116,10 +113,10 @@ public class BoggleGameScreen extends JFrame {
         wordInput2 = new JLabel("", JLabel.LEFT);
         submitButton2 = new JButton("GUESS");
 
-        this.minLength = minLength;
         submitButton.addActionListener(submitWord);
         submitButton2.addActionListener(submitWord);
         submitButton2.setEnabled(false);
+        this.minLength = minLength;
 
         wordLabel.setPreferredSize(new Dimension(200, 20));
         wordLabel2.setPreferredSize(new Dimension(330, 20));
@@ -171,6 +168,7 @@ public class BoggleGameScreen extends JFrame {
         timerLabel.setMaximumSize(new Dimension(width, 100));
         this.duration = duration * 1000; // convert seconds to milliseconds
         currDuration = duration * 1000;
+
         startTimer();
 
         timerPanel.add(turnLabel);
@@ -189,6 +187,8 @@ public class BoggleGameScreen extends JFrame {
 
         wordLengths = new int[maxDisplayedLength - minLength + 1];
         wordLengthsLabels = new JLabel[maxDisplayedLength - minLength + 1];
+
+        // Store all the possible words on the board
         ArrayList<String> possibleWords = BoggleAlgorithms.getAllWords(grid, dictionary, minLength);
         totalWords = possibleWords.size();
 
@@ -244,10 +244,12 @@ public class BoggleGameScreen extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 if (pauseButton.getText().equals("PAUSE")) {
                     pauseButton.setText("UNPAUSE");
+                    // Store the current elapsed time
                     pausedTime += 1000 * (((int) elapsed + 500) / 1000);
                     timer.stop();
                 } else {
                     pauseButton.setText("PAUSE");
+                    // Resume the timer at the paused time
                     resumeTimer(pausedTime);
                 }
             }
@@ -333,6 +335,7 @@ public class BoggleGameScreen extends JFrame {
         setVisible(true);
     }
 
+    // Action handler for submit button
     private ActionListener submitWord = new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -342,6 +345,11 @@ public class BoggleGameScreen extends JFrame {
         }
     };
 
+    /**
+     * This method proccesses the guessed word and adds the corresponding score to the player
+     *
+     * @param isPlayerOne A boolean determining if player one or two has guessed
+     */
     private void processWord (boolean isPlayerOne) {
         String wordGuessed = isPlayerOne ? wordInput.getText().toUpperCase() : wordInput2.getText().toUpperCase(); // get the word from the text field
 
@@ -430,8 +438,10 @@ public class BoggleGameScreen extends JFrame {
      * @param words A list containing all the possible words
      */
     private void assignWordLengths(ArrayList<String> words) {
-        Arrays.fill(wordLengths, 0);
+        Arrays.fill(wordLengths, 0); // Reset the amounts in the list
+
         for (String word : words) {
+            // Add one at the index corresponding to the length
             int index = word.length() - (maxDisplayedLength - wordLengths.length + 1);
             if (word.length() > 8) {
                 index -= word.length() - maxDisplayedLength;
@@ -443,6 +453,7 @@ public class BoggleGameScreen extends JFrame {
         wordResultPanel.add(wordResult);
         wordResultPanel.add(totalWordsLabel);
 
+        // Display the amount of words at each valid length
         for (int i = 0; i < wordLengths.length; i++) {
             int currLength = maxDisplayedLength - wordLengths.length + i + 1;
             wordLengthsLabels[i] = new JLabel(currLength + ": " + wordLengths[i], JLabel.CENTER);
@@ -457,6 +468,7 @@ public class BoggleGameScreen extends JFrame {
     private long elapsed = 0;
     private int pausedTime = 0;
 
+    // Timer displaying the amount of time left a player has to guess
     private Timer timer = new Timer(1000, new ActionListener() {
         public void actionPerformed(ActionEvent evt) {
             if (startTime < 0) {
@@ -464,7 +476,8 @@ public class BoggleGameScreen extends JFrame {
             }
             long now = System.currentTimeMillis();
             elapsed = now - startTime;
-            if (elapsed >= currDuration) {
+
+            if (elapsed >= currDuration) { // If the timer has reached the duration
                 timer.stop();
                 new BoggleMusicPlayer("ICS4UBoggle/audio/sound_effects/", "Timer", false);
                 elapsed = currDuration;
@@ -479,8 +492,10 @@ public class BoggleGameScreen extends JFrame {
                 if (!hasRestarted) {
                     changeTurn();
                 }
-                startTimer();
+
+                startTimer(); // Start a new timer for the other player
             } else {
+                // Display the amount of time the player has left to guess
                 int secondsLeft = (int) ((currDuration - elapsed + 500) / 1000);
                 timerLabel.setText("Time Left to Guess: " + secondsLeft);
             }
@@ -499,47 +514,58 @@ public class BoggleGameScreen extends JFrame {
             submitButton2.setEnabled(true);
             if (playerIndication2.getText().equals("Computer Player")) {
                 // Run computer player guess logic
-                try {
-                    ArrayList<int[]> path = cpu.start(); // Get the path of the random word
-                    
-                    // Create the word formed by the path
-                    String word = "";
-                    for (int[] coord : path) {
-                        word = word + grid[coord[1]][coord[0]];
-                    }
-                    final String guessedWord = word;
-
-                    if (word != null && !word.isEmpty()) {
-                        // Display the CPU's word at a 500ms interval
-                        Timer displayCPU = new Timer(500, new ActionListener() {
-                            public void actionPerformed(ActionEvent evt) {
-                                if (wordInput2.getText().equals(guessedWord)) {
-                                    ((Timer) evt.getSource()).stop();
-                                    processWord(false);
-                                    restartButton.setEnabled(true);
-                                }
-                                else {
-                                    board[path.get(0)[1]][path.get(0)[0]].setBackground(Color.GREEN);
-                                    wordInput2.setText(wordInput2.getText() + grid[path.get(0)[1]][path.get(0)[0]]);
-                                    path.remove(0);
-                                }
-                            }
-                        });
-                        int delay = (int) (Math.random() * ((duration-500)/word.length())/500)*500+1000;
-                        displayCPU.setInitialDelay(delay);
-                        displayCPU.start();
-                        restartButton.setEnabled(false);
-                    }
-                } 
-                catch (Exception ex) {
-                    wordInput2.setText("I am stumped");
-                }
+                runComputerLogic();
             }
         }
         else {
             turnLabel.setText(playerIndication.getText() + "'s Turn");
             submitButton.setEnabled(true);
             submitButton2.setEnabled(false);
+        }
+    }
+
+    /**
+     * This method processes the computer player's guess
+     */
+    private void runComputerLogic() {
+        try {
+            ArrayList<int[]> path = cpu.getComputerWordPath(); // Get the path of the random word
+            
+            // Create the word formed by the path
+            String word = "";
+            for (int[] coord : path) {
+                word = word + grid[coord[1]][coord[0]];
+            }
+            final String guessedWord = word;
+
+            if (word != null && !word.isEmpty()) {
+                // Display the CPU's word at a 500ms interval
+                Timer displayCPU = new Timer(500, new ActionListener() {
+                    public void actionPerformed(ActionEvent evt) {
+                        if (wordInput2.getText().equals(guessedWord)) {
+                            // Stop the timer if the full word has been displayed
+                            ((Timer) evt.getSource()).stop();
+                            processWord(false);
+                            restartButton.setEnabled(true);
+                        }
+                        else {
+                            // Show the path formed by the computer's word on the board
+                            board[path.get(0)[1]][path.get(0)[0]].setBackground(Color.GREEN);
+                            wordInput2.setText(wordInput2.getText() + grid[path.get(0)[1]][path.get(0)[0]]);
+                            path.remove(0);
+                        }
+                    }
+                });
+                // Set a random delay to create a more real experience
+                int delay = (int) (Math.random() * ((duration-500)/word.length())/500)*500+1000;
+                displayCPU.setInitialDelay(delay);
+                displayCPU.start();
+                restartButton.setEnabled(false);
+            }
+        } 
+        catch (Exception ex) {
+            // Word could not be formed on the random starting cell
+            wordInput2.setText("I am stumped");
         }
     }
 
@@ -583,7 +609,7 @@ public class BoggleGameScreen extends JFrame {
      * has to guess
      */
     private void resumeTimer(int pausedTime) {
-        currDuration = duration - pausedTime;
+        currDuration = duration - pausedTime; // Set the timer to the leftover duration
         startTime = -1;
         timer.setInitialDelay(0);
         timer.start();
@@ -596,8 +622,7 @@ public class BoggleGameScreen extends JFrame {
      * face of
      * that die to place in every one of the 25 positions on the grid
      * 
-     * @param grid  A grid filled with characters that will contain the values of
-     *              the board
+     * @param grid  A grid filled with characters that will contain the values of the board
      * @param board A grid filled with JButtons that will be edited by this method
      */
     private void createGrid(char[][] grid, JButton[][] board) {
@@ -723,27 +748,5 @@ public class BoggleGameScreen extends JFrame {
             System.out.println(exception);
         }
         return diceList;
-    }
-
-    /**
-     * A method that reads in the dictionary from a text file
-     * 
-     * @return An array list containing strings of all the words in the dictionary
-     */
-    private ArrayList<String> getDictionaryFromFile() {
-        ArrayList<String> dictionary = new ArrayList<String>();
-        try {
-            File file = new File("ICS4UBoggle/files/dictionary.txt");
-            Scanner in = new Scanner(file);
-
-            while (in.hasNextLine()) {
-                String nextLine = in.nextLine();
-                dictionary.add(nextLine);
-            }
-            in.close();
-        } catch (FileNotFoundException exception) {
-            System.out.println(exception);
-        }
-        return dictionary;
     }
 }

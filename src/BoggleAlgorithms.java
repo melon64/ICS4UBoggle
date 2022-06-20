@@ -9,7 +9,6 @@ import java.util.*;
  * Description: A program that contains a number of useful algorithms for the game of Boggle
  */
 
-
 public class BoggleAlgorithms {
     /**
      * This method checks whether or not a specific word is found on the board.
@@ -96,6 +95,7 @@ public class BoggleAlgorithms {
      *
      * @param board The letters that are currently on the board
      * @param dictionary The list of valid words to check for on the board
+     * @param minLength The minimum length required for guessed words
      * @return      An array list of words that can be formed on the board
      *              returns an empty array list if the word isn't found
      */
@@ -121,7 +121,19 @@ public class BoggleAlgorithms {
     private static ArrayList<String> prefixes8 = getPrefixes("prefixes/prefixes8");
     private static ArrayList<String> combinations = getPrefixes("combinations");
 
-    public static void traverseBoard(char[][] board, boolean[][] visited, int minLength, String word, int currRow, int currCol, ArrayList<String> words, ArrayList<String> dictionary) {
+    /**
+     * This method traverses the board and checks if the word formed on the current path is valid
+     *
+     * @param board The letters that are currently on the board
+     * @param visited The grid cells that have already been visited on the path
+     * @param minLength The minimum length required for guessed words
+     * @param word The current word formed by the path
+     * @param currRow The current row of the grid cell
+     * @param currCol The current column of the grid cell
+     * @param usedWords The list of valid words that has been found
+     * @param dictionary The list of valid words to check for on the board
+     */
+    public static void traverseBoard(char[][] board, boolean[][] visited, int minLength, String word, int currRow, int currCol, ArrayList<String> usedWords, ArrayList<String> dictionary) {
         // Set current cell as visited
         visited[currRow][currCol] = true;
 
@@ -129,10 +141,10 @@ public class BoggleAlgorithms {
         word = word + board[currRow][currCol];
         
         // If the word exists in the dictionary, is not already in the list, and at least the minimum length
-        if (getIdxOfWord(dictionary, word) != -1 && getIdxOfWord(words, word) == -1 && word.length() >= minLength) {
-            words.add(word);
+        if (getIdxOfWord(dictionary, word) != -1 && getIdxOfWord(usedWords, word) == -1 && word.length() >= minLength) {
+            usedWords.add(word);
             // Sort the list to be able to use binary search
-            Collections.sort(words);
+            Collections.sort(usedWords);
         }
 
         boolean prefix3Exists = (word.length() >= 3 && getIdxOfWord(prefixes3, word.substring(0, 3)) != -1);
@@ -157,7 +169,7 @@ public class BoggleAlgorithms {
                                 for (int[] pos : adjacentCells) {
                                     // If the adjacent cell is within the bounds and not visited
                                     if (inBounds(board, pos[0], pos[1]) && !visited[pos[0]][pos[1]]) {
-                                        traverseBoard(board, visited, minLength, word, pos[0], pos[1], words, dictionary);
+                                        traverseBoard(board, visited, minLength, word, pos[0], pos[1], usedWords, dictionary);
                                     }
                                 }
                             }
@@ -165,14 +177,10 @@ public class BoggleAlgorithms {
                     }
                 }
             }
-
         }
 
-        // Remove the last character of the word
-        word = "" + word.charAt(word.length()-1);
-
-        // Set the current cell as unvisited
-        visited[currRow][currCol] = false;
+        word = "" + word.charAt(word.length()-1); // Remove the last character of the word
+        visited[currRow][currCol] = false; // Set the current cell as unvisited
     }
 
     /**
@@ -192,13 +200,11 @@ public class BoggleAlgorithms {
             for (int i = 0; i < word.length()-1; i++) {
                 // If the combination exists in the list
                 if (getIdxOfWord(combinations, word.substring(i, i+2)) != -1) {
-                    // Combination has been found
-                    return true; 
+                    return true; // Combination has been found
                 }
             }
         }
-        // Combination has not been found
-        return false;
+        return false; // Combination has not been found
     }
 
     /**
@@ -217,7 +223,7 @@ public class BoggleAlgorithms {
      * This method reads the words from the files and stores them in a list
      * 
      * @param fileName The name of the file to be read from
-     * @return    A list of all the prefixes
+     * @return  A list of all the prefixes
      */
     public static ArrayList<String> getPrefixes(String fileName) {
         ArrayList<String> prefixList = new ArrayList<String>();
@@ -387,5 +393,27 @@ public class BoggleAlgorithms {
         } else {
             return 1;
         }
+    }
+
+    /**
+     * A method that reads in the dictionary from a text file
+     * 
+     * @return An array list containing strings of all the words in the dictionary
+     */
+    public static ArrayList<String> getDictionaryFromFile() {
+        ArrayList<String> dictionary = new ArrayList<String>();
+        try {
+            File file = new File("ICS4UBoggle/files/dictionary.txt");
+            Scanner in = new Scanner(file);
+
+            while (in.hasNextLine()) {
+                String nextLine = in.nextLine();
+                dictionary.add(nextLine);
+            }
+            in.close();
+        } catch (FileNotFoundException exception) {
+            System.out.println(exception);
+        }
+        return dictionary;
     }
 }

@@ -1,19 +1,24 @@
 package ICS4UBoggle.src.ai;
 
-import java.util.*;
+/**
+ * Names: Adarsh P, Larris X, Felix X, and Hubert X
+ * Date: June 15, 2022
+ * Description: A program that contains the AI/Computer Player logic
+ */
 
+import java.util.*;
 import ICS4UBoggle.src.BoggleAlgorithms;
 
 public class ComputerPlayer {
-    Cell[][] cells;
+    private Cell[][] cells;
 
-    int rows; // y
-    int cols; // x
-    int minLength = 3;
+    private int rows; // y
+    private int cols; // x
+    private int minLength = 3;
 
-    Stack<Cell> letterStack = new Stack<>();
-    Dictionary dictionary = new Dictionary();
-    HashSet<String> wordsFound;
+    private ArrayList<String> dictionary = BoggleAlgorithms.getDictionaryFromFile();
+    private Stack<Cell> letterStack = new Stack<>();
+    private HashSet<String> wordsFound;
 
     Position[] deltaPositions = {
             new Position(0, -1), // N
@@ -27,7 +32,9 @@ public class ComputerPlayer {
     };
 
     /**
-     * @param boggleGrid The gameboard
+     * @param boggleGrid The letters that are currently on the board
+     * @param usedWords The list of already guessed words
+     * @param minLength The minimum length required for guessed words
      */
     public ComputerPlayer(char[][] boggleGrid, ArrayList<String> usedWords, int minLength) {
         rows = boggleGrid.length;
@@ -45,8 +52,13 @@ public class ComputerPlayer {
         wordsFound = new HashSet<>(usedWords);
     }
 
-    public ArrayList<int[]> start() {
-        run();
+    /**
+     * Gets the computer player's word path through coordinates
+     * 
+     * @return A list of coordinates that contains the path to form the word
+     */
+    public ArrayList<int[]> getComputerWordPath() {
+        getComputerWord();
         
         ArrayList<int[]> list = new ArrayList<>();
         String word = "";
@@ -57,13 +69,14 @@ public class ComputerPlayer {
         }
 
         return list;
-
     }
+
     /**
-     * Run from here
-     * @return
+     * Gets the computer player's word formed by cells
+     * 
+     * @return A collection of letters guessed and their coordinates
      */
-    public Collection<Cell> run() {
+    public Collection<Cell> getComputerWord() {
         Cell startCell = getRandomCell();
         letterStack.clear();
         if (startCell == null) { // if all start cells have been used, return -1
@@ -74,18 +87,29 @@ public class ComputerPlayer {
         }
     }
 
-    // DFS
+    /**
+     * This method checks if a word can be formed at a cell
+     * 
+     * @param cell Current cell
+     * @return A boolean for if a word can be formed starting at the word
+     */
     public boolean doesCellMakeWord(Cell cell) {
         letterStack.push(cell);
         
         String word = stackWord();
-        if (BoggleAlgorithms.getIdxOfWord(dictionary.dictionary, word) != -1 && !wordsFound.contains(word) && word.length() > minLength) {
+        if (BoggleAlgorithms.getIdxOfWord(dictionary, word) != -1 && !wordsFound.contains(word) && word.length() > minLength) {
             wordsFound.add(word);
             return true;
         }
         return doesAdjacentCellsMakeWord(cell);
     }
 
+    /**
+     * This method iterates through adjacent cells to check if the word can be extended
+     * 
+     * @param cell Current cell
+     * @return A boolean for if word is valid
+     */
     public boolean doesAdjacentCellsMakeWord(Cell cell) {
         if (isWordStart(stackWord())) {
             for (Position pos : deltaPositions) {
@@ -101,6 +125,12 @@ public class ComputerPlayer {
         return false;
     }
 
+    /**
+     * This method gets the next traversable cell
+     * 
+     * @param pos Current position
+     * @return A cell at the new position
+     */
     public Cell nextCell(Position pos) {
         if (pos.y >= rows || pos.y < 0
                 || pos.x >= cols || pos.x < 0
@@ -110,9 +140,18 @@ public class ComputerPlayer {
         return cells[pos.y][pos.x];
     }
 
+    /**
+     * Gets a random cell that has not been visited
+     *
+     * @return An unvisited cell
+     */
     public Cell getRandomCell() {
-        if (isAllVisited()) { // if every cell has been tried, return null
-            return null;
+        if (isAllVisited()) { // if every cell has been tried, reset the visited status
+            for (int i = 0; i < cells.length; i++) {
+                for (int j = 0; j < cells[0].length; j++) {
+                    cells[i][j].setVisited();
+                }
+            }
         }
 
         int randX;
@@ -131,6 +170,11 @@ public class ComputerPlayer {
         return cells[randY][randX];
     }
 
+    /**
+     * Checks if all cells have been visited
+     * 
+     * @return A boolean representing if all cells have been visited
+     */
     public boolean isAllVisited() {
         for (int y = 0; y < cells.length; y++) {
             for (int x = 0; x < cells[0].length; x++) {
@@ -143,6 +187,11 @@ public class ComputerPlayer {
         return true;
     }
 
+    /**
+     * Creates a string from the selected characters
+     * 
+     * @return The word formed from the characters
+     */
     public String stackWord() {
         char[] chars = new char[letterStack.size()];
 
@@ -154,9 +203,15 @@ public class ComputerPlayer {
         return word;
     }
 
-    public boolean isWordStart(String str) {
-        for (String word : dictionary.dictionary) {
-            if (word.startsWith(str)) {
+    /**
+     * Checks if the current word exists as a prefix in the dictionary
+     * 
+     * @param currWord The current word to check for
+     * @return A boolean representing if the current word can form a word in the dictionary
+     */
+    public boolean isWordStart(String currWord) {
+        for (String word : dictionary) {
+            if (word.startsWith(currWord)) {
                 return true;
             }
         }
