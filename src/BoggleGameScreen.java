@@ -382,7 +382,7 @@ public class BoggleGameScreen extends JFrame {
 
         if (wordGuessed.length() >= minLength && !usedWord) {
             // use getWordPath to check if the word exists in the maze
-            ArrayList<Integer[]> path = BoggleAlgorithms.getWordPath(grid, wordGuessed);
+            ArrayList<int[]> path = BoggleAlgorithms.getWordPath(grid, wordGuessed);
 
             // use getIdxOfWord to check if the word is in the dictionary
             boolean isValidWord = BoggleAlgorithms.getIdxOfWord(dictionary, wordGuessed) != -1;
