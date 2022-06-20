@@ -78,7 +78,6 @@ public class BoggleInstructionsPanel extends JFrame {
         scrollableMainPanel.setPreferredSize(new Dimension(800, 300));
 
         add(scrollableMainPanel);
-        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setVisible(true);
     }
 }
