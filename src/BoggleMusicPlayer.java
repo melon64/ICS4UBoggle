@@ -21,7 +21,7 @@ public class BoggleMusicPlayer {
     public BoggleMusicPlayer(String trackPath, String trackName, boolean doLoop) {
         // Create a new thread for playing the audio file so that this is done in the 
         // background while any other programs continue to run
-        Thread t = new Thread(new Runnable() {
+        new Thread() {
             @Override
             public void run() {
                 try {
@@ -41,8 +41,7 @@ public class BoggleMusicPlayer {
                 catch (IOException e) {e.printStackTrace();} 
                 catch (LineUnavailableException e) {e.printStackTrace();}
             }
-        });
-        t.start();
+        }.start();
     }
 
     /**
@@ -52,7 +51,7 @@ public class BoggleMusicPlayer {
      */
     public void manageClipPlayback(Clip clip, boolean doLoop) {
         long currPosition = -1;
-        while (!clip.isRunning()) {
+        while (clip.isOpen()) {
             if (clipPaused) {
                 if (currPosition == -1) {
                     currPosition = clip.getMicrosecondPosition();
