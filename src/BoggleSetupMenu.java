@@ -43,6 +43,8 @@ public class BoggleSetupMenu extends JFrame {
         GridBagConstraints constraints = new GridBagConstraints();
         constraints.insets = new Insets(5, 5, 5, 5);
 
+        // Create the instruction panel
+        BoggleInstructionsPanel instructionPanel = new BoggleInstructionsPanel();
 
         // ====================================
         // MODE SELECTION SECTION
@@ -59,7 +61,6 @@ public class BoggleSetupMenu extends JFrame {
         constraints.gridy = 0;
         constraints.anchor = GridBagConstraints.WEST;
         settingsPanel.add(modeChoiceBox, constraints);
-
 
         // ====================================
         // TIMER SETTING SECTION
@@ -82,7 +83,6 @@ public class BoggleSetupMenu extends JFrame {
         constraints.anchor = GridBagConstraints.WEST;
         settingsPanel.add(timerSpinner, constraints);
 
-
         // ====================================
         // WORD LENGTH SETTING SECTION
         // ====================================
@@ -103,7 +103,6 @@ public class BoggleSetupMenu extends JFrame {
         constraints.gridy = 2;
         constraints.anchor = GridBagConstraints.WEST;
         settingsPanel.add(wordLengthSlider, constraints);
-
 
         // ====================================
         // TOURNAMENT SCORE SETTING SECTION
@@ -126,7 +125,6 @@ public class BoggleSetupMenu extends JFrame {
         constraints.anchor = GridBagConstraints.WEST;
         settingsPanel.add(scoreSpinner, constraints);
 
-
         // ====================================
         // MUSIC SELECTION SECTION
         // ====================================
@@ -142,7 +140,6 @@ public class BoggleSetupMenu extends JFrame {
         constraints.gridy = 4;
         constraints.anchor = GridBagConstraints.WEST;
         settingsPanel.add(musicChoiceBox, constraints);
-
 
         // ====================================
         // SUBMIT BUTTON SECTION
@@ -162,10 +159,10 @@ public class BoggleSetupMenu extends JFrame {
                 int minLength = getMinLength();
                 String track = getTrack();
                 dispose();
+                instructionPanel.dispose();
                 new BoggleGameScreen(gameMode, tournamentScore, duration, minLength, track);
             }
         });
-
 
         // ====================================
         // FINALIZATION SECTION

@@ -112,6 +112,7 @@ public class BoggleAlgorithms {
         return words;
     }
 
+    // Get all the possible prefixes at a certain length
     private static ArrayList<String> prefixes3 = getPrefixes("prefixes/prefixes3");
     private static ArrayList<String> prefixes4 = getPrefixes("prefixes/prefixes4");
     private static ArrayList<String> prefixes5 = getPrefixes("prefixes/prefixes5");

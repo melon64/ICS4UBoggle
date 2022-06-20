@@ -21,8 +21,9 @@ public class BoggleInstructionsPanel extends JFrame {
     ArrayList<JTextArea> text;
 
     public BoggleInstructionsPanel() {
-        setSize(500, 300);
+        setSize(500, 500);
         setTitle("Boggle Instructions");
+        setLocation(500, 0);
         
         mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));

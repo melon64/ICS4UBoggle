@@ -54,10 +54,12 @@ public class BoggleGameScreen extends JFrame {
     private int minLength;
     private int tournamentScore;
     private int[] wordLengths;
+    private boolean hasRestarted = false;
 
     public final ArrayList<String> usedWords = new ArrayList<String>();
     private final ArrayList<String> dictionary = getDictionaryFromFile();
     private final ArrayList<char[]> dice = readDiceDistribution();
+
     private BoggleMusicPlayer bgm;
     private ComputerPlayer cpu;
 
@@ -188,7 +190,6 @@ public class BoggleGameScreen extends JFrame {
         wordLengths = new int[maxDisplayedLength - minLength + 1];
         wordLengthsLabels = new JLabel[maxDisplayedLength - minLength + 1];
         ArrayList<String> possibleWords = BoggleAlgorithms.getAllWords(grid, dictionary, minLength);
-        // System.out.println(possibleWords.toString());
         totalWords = possibleWords.size();
 
         wordResult = new JLabel("Click on the letters to form a word", JLabel.CENTER);
@@ -267,7 +268,7 @@ public class BoggleGameScreen extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 new BoggleMusicPlayer("ICS4UBoggle/audio/sound_effects/", "Restart", false);
-
+                
                 // Reset all componenets
                 createGrid(grid, board); // Create a new grid and board
                 cpu = new ComputerPlayer(grid, usedWords, minLength); // Create a new CPU
@@ -275,11 +276,11 @@ public class BoggleGameScreen extends JFrame {
                 totalWords = possibleWords.size(); // Update the new total words
                 usedWords.clear(); // Clear all the past used words
                 assignWordLengths(possibleWords); // Update the new number of words at each length
-
+                
                 // Reset the scores
                 score = 0;
                 score2 = 0;
-
+                
                 // Update labels
                 totalWordsLabel.setText("0/" + totalWords + " WORDS");
                 scoreLabel.setText("Player 1 Score: " + score);
@@ -287,13 +288,15 @@ public class BoggleGameScreen extends JFrame {
                 wordResult.setText("Click on the letters to form a word");
                 winner.setText("The winner is ");
                 winner.setVisible(false);
-
+                
                 // Change the turn to the first player
-                if (!getCurrentPlayer().equals(playerIndication2.getText())) {
+                if (getCurrentPlayer().equals(playerIndication2.getText())) {
                     changeTurn();
                 }
+                hasRestarted = true;
                 bgm.unpauseClip();
                 startTimer();
+                hasRestarted = false;
             }
         });
 
@@ -334,7 +337,6 @@ public class BoggleGameScreen extends JFrame {
         @Override
         public void actionPerformed(ActionEvent e) {
             wordResult.setVisible(true);
-
             boolean isPlayerOne = e.getSource() == submitButton; // check which player has guessed
             processWord(isPlayerOne);
         }
@@ -436,7 +438,6 @@ public class BoggleGameScreen extends JFrame {
             }
             wordLengths[index]++;
         }
-        // System.out.println(Arrays.toString(wordLengths));
 
         wordResultPanel.removeAll();
         wordResultPanel.add(wordResult);
@@ -475,7 +476,9 @@ public class BoggleGameScreen extends JFrame {
                 } else {
                     passedTurns++;
                 }
-                changeTurn();
+                if (!hasRestarted) {
+                    changeTurn();
+                }
                 startTimer();
             } else {
                 int secondsLeft = (int) ((currDuration - elapsed + 500) / 1000);
@@ -513,6 +516,7 @@ public class BoggleGameScreen extends JFrame {
                                 if (wordInput2.getText().equals(guessedWord)) {
                                     ((Timer) evt.getSource()).stop();
                                     processWord(false);
+                                    restartButton.setEnabled(true);
                                 }
                                 else {
                                     board[path.get(0)[1]][path.get(0)[0]].setBackground(Color.GREEN);
@@ -524,6 +528,7 @@ public class BoggleGameScreen extends JFrame {
                         int delay = (int) (Math.random() * ((duration-500)/word.length())/500)*500+1000;
                         displayCPU.setInitialDelay(delay);
                         displayCPU.start();
+                        restartButton.setEnabled(false);
                     }
                 } 
                 catch (Exception ex) {
@@ -542,6 +547,7 @@ public class BoggleGameScreen extends JFrame {
      * This method resets necessary components after a guess has been made
      */
     private void resetGuess() {
+        // Clear the inputed words
         wordInput.setText("");
         wordInput2.setText("");
         path.clear(); // Clear the current path
@@ -554,14 +560,16 @@ public class BoggleGameScreen extends JFrame {
     }
 
     /**
-     * This method starts a timer that indicates the amount of time left a player
+     * This method starts the timer that indicates the amount of time left a player
      * has to guess
      */
     private void startTimer() {
         // Reset the timer
         if (timer.isRunning()) {
             timer.stop();
-            changeTurn();
+            if (!hasRestarted) {
+                changeTurn();
+            }
         }
 
         currDuration = duration;
@@ -570,6 +578,10 @@ public class BoggleGameScreen extends JFrame {
         timer.start();
     }
 
+    /**
+     * This method resumes the timer that indicates the amount of time left a player
+     * has to guess
+     */
     private void resumeTimer(int pausedTime) {
         currDuration = duration - pausedTime;
         startTime = -1;
