@@ -8,6 +8,8 @@ package ICS4UBoggle.src;
 
 import javax.swing.*;
 import javax.swing.Timer;
+import javax.swing.border.EmptyBorder;
+
 import ICS4UBoggle.src.ai.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -113,6 +115,8 @@ public class BoggleGameScreen extends JFrame {
         boardPanel.setLayout(new GridLayout(5, 5));
         boardPanel.setPreferredSize(new Dimension(width, 300));
         boardPanel.setBackground(LIGHT_BLUE);
+        // Add 20 pixels of padding to the left and to the right of boardPanel
+        boardPanel.setBorder(new EmptyBorder(0, 20, 0, 20));
 
         scorePanel = new JPanel();
         scorePanel.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 10));
