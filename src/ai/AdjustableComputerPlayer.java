@@ -59,7 +59,7 @@ public class AdjustableComputerPlayer {
             Random randNumGen = new Random();
             do {
                 double gaussianMean = possibleWords.size() * computerDifficulty / 10;
-                double gaussianStd = 10;
+                double gaussianStd = 5;
                 int randIdx = (int)((randNumGen.nextGaussian() * gaussianStd) + gaussianMean);
                 if (randIdx < 0 || randIdx >= possibleWords.size()) {
                     chosenWord = "";
