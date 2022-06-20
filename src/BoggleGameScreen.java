@@ -172,6 +172,7 @@ public class BoggleGameScreen extends JFrame {
         // ====================================
 
         turnLabel = new JLabel(playerIndication.getText() + "'s Turn", JLabel.CENTER);
+        turnLabel.setForeground(Color.BLUE);
         timerLabel = new JLabel("Time Left to Guess: " + duration, JLabel.CENTER);
         timerLabel.setFont(new Font("Dialog", Font.BOLD, 24));
         turnLabel.setFont(defaultFont);
@@ -226,8 +227,10 @@ public class BoggleGameScreen extends JFrame {
         // ====================================
 
         scoreLabel = new JLabel("Player 1 Score: " + score, JLabel.CENTER);
+        scoreLabel.setForeground(Color.BLUE);
         String playerScore = gameMode.equals("Single Player") ? "Computer Player Score: " : "Player 2 Score: ";
         scoreLabel2 = new JLabel(playerScore + score2, JLabel.CENTER);
+        scoreLabel2.setForeground(Color.RED);
         tournamentScoreLabel = new JLabel("Score to Reach: " + tournamentScore, JLabel.CENTER);
 
         this.tournamentScore = tournamentScore;
@@ -322,6 +325,7 @@ public class BoggleGameScreen extends JFrame {
                 scoreLabel2.setText(playerScore + score2);
                 wordResult.setText("Click on the letters to form a word");
                 winner.setText("The winner is ");
+                winner.setForeground(Color.BLACK);
                 winner.setVisible(false);
                 
                 // Change the turn to the first player
@@ -438,11 +442,14 @@ public class BoggleGameScreen extends JFrame {
                 // Check if a player has reached the winning condition
                 if (score >= tournamentScore) {
                     winner.setText(winner.getText() + playerIndication.getText() + "!");
+                    winner.setForeground(Color.BLUE);
                     winnerDecided = true;
                 } else if (score2 >= tournamentScore) {
                     winner.setText(winner.getText() + playerIndication2.getText() + "!");
+                    winner.setForeground(Color.RED);
                     winnerDecided = true;
                 }
+
                 if (winnerDecided) {
                     winner.setVisible(true);
                     if (musicPlaying) {
@@ -563,6 +570,7 @@ public class BoggleGameScreen extends JFrame {
         String currPlayer = getCurrentPlayer();
         if (currPlayer.equals(playerIndication.getText())) {
             turnLabel.setText(playerIndication2.getText() + "'s Turn");
+            turnLabel.setForeground(Color.RED);
             submitButton.setEnabled(false);
             submitButton2.setEnabled(true);
             if (playerIndication2.getText().equals("Computer Player")) {
@@ -572,6 +580,7 @@ public class BoggleGameScreen extends JFrame {
         }
         else {
             turnLabel.setText(playerIndication.getText() + "'s Turn");
+            turnLabel.setForeground(Color.BLUE);
             submitButton.setEnabled(true);
             submitButton2.setEnabled(false);
         }
